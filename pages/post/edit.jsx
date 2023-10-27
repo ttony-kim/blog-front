@@ -1,3 +1,9 @@
+import Editor from "../../component/editor";
+
 export default function PostEdit() {
-  return "글쓰기 창";
+  return (
+    <>
+      <Editor />
+    </>
+  );
 }
