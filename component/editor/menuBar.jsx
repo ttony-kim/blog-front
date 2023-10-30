@@ -1,30 +1,26 @@
-import { Fragment } from "react";
+import { Fragment, useCallback, useState } from "react";
 import MenuItem from "./menuItem";
-import css from "styled-jsx/css";
-
-const style = css`
-  .divider {
-    background-color: #ffffff40;
-    height: 1.25rem;
-    margin-left: 0.5rem;
-    margin-right: 0.75rem;
-    width: 1px;
-  }
-
-  .editor__header {
-    align-items: center;
-    background: #0d0d0d;
-    border-bottom: 3px solid #0d0d0d;
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
-    display: flex;
-    flex: 0 0 auto;
-    flex-wrap: wrap;
-    padding: 0.25rem;
-  }
-`;
+import ImageDialog from "./imageDialog";
 
 export default function MenuBar({ editor }) {
+  // image Dialog 상태 값
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleImageUpload = useCallback(
+    (url) => {
+      handleClose();
+      console.log(url);
+      if (url) {
+        editor.chain().focus().setImage({ src: url }).run();
+      }
+    },
+    [editor]
+  );
+
   const items = [
     {
       icon: "bold",
@@ -141,10 +137,16 @@ export default function MenuBar({ editor }) {
       title: "Redo",
       action: () => editor.chain().focus().redo().run(),
     },
+    {
+      icon: "image-add-line",
+      title: "Image",
+      action: () => setOpen(true),
+    },
   ];
+
   return (
     <div>
-      <div className="editor__header">
+      <div className="editor-header">
         {items.map((item, index) => (
           <Fragment key={index}>
             {item.type === "divider" ? (
@@ -155,7 +157,11 @@ export default function MenuBar({ editor }) {
           </Fragment>
         ))}
       </div>
-      <style jsx>{style}</style>
+      <ImageDialog
+        open={open}
+        handleClose={handleClose}
+        handleImageUpload={handleImageUpload}
+      />
     </div>
   );
 }
