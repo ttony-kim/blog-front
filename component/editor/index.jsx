@@ -7,10 +7,13 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import MenuBar from "./menuBar";
 
-export default function Editor() {
+export default function Editor({ setData }) {
   const editor = useEditor({
     extensions: [StarterKit, Highlight, TaskList, TaskItem, Image, Dropcursor],
     content: `<p>Hello World! 🌎️</p>`,
+    onUpdate: ({ editor }) => {
+      setData(editor.getHTML());
+    },
   });
 
   return (
