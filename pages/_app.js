@@ -11,7 +11,15 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <Header />
-      <Box sx={{ width: 800, margin: "auto" }}>
+      <Box
+        sx={{
+          width: 800,
+          margin: "auto",
+          minHeight: "750px",
+          height: "auto",
+          paddingBottom: "60px",
+        }}
+      >
         <Component {...pageProps} />
       </Box>
       <Footer />
