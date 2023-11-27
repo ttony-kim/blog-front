@@ -6,15 +6,22 @@ import TaskList from "@tiptap/extension-task-list";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import MenuBar from "./menuBar";
+import { useEffect } from "react";
 
-export default function Editor({ setData }) {
+export default function Editor({ data, setData }) {
   const editor = useEditor({
     extensions: [StarterKit, Highlight, TaskList, TaskItem, Image, Dropcursor],
-    content: `<p>Hello World! 🌎️</p>`,
+    content: "",
     onUpdate: ({ editor }) => {
       setData(editor.getHTML());
     },
   });
+
+  useEffect(() => {
+    if (editor) {
+      editor.commands.setContent(data);
+    }
+  }, [editor, data]);
 
   return (
     <>

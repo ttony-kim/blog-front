@@ -38,7 +38,7 @@ export default function Post() {
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <span>Category ({data.count})</span>
-        <Link href="/post/edit">
+        <Link href="/post/register">
           <IconButton aria-label="delete">
             <EditOutlinedIcon />
           </IconButton>
