@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Divider,
   IconButton,
   List,
@@ -7,16 +8,19 @@ import {
   ListItemText,
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 export default function Post() {
-  const [data, setData] = useState({ count: 0, list: [] });
+  const [data, setData] = useState({ count: 0, list: [], last: true });
+  const [page, setPage] = useState({ page: 0, size: 5 });
   const router = useRouter();
 
-  const init = async () => {
-    await fetch("/api/posts")
+  const getData = useCallback(async () => {
+    const queryString = new URLSearchParams(page).toString();
+
+    await fetch(`/api/posts?${queryString}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`${res.status} 에러가 발생했습니다.`);
@@ -24,15 +28,22 @@ export default function Post() {
         return res.json();
       })
       .then((json) => {
-        console.log(json);
-        setData({ count: json.count, list: json.list });
+        setData((prev) => ({
+          count: json.totalElements,
+          list: [...prev.list, ...json.content],
+          last: json.last,
+        }));
       })
       .catch((error) => console.log(error.message));
+  }, [page]);
+
+  const handleMoreClick = () => {
+    setPage((prev) => ({ ...prev, page: prev.page + 1 }));
   };
 
   useEffect(() => {
-    init();
-  }, []);
+    getData();
+  }, [getData]);
 
   return (
     <>
@@ -54,6 +65,17 @@ export default function Post() {
             <Divider />
           </Box>
         ))}
+        {!data.last && (
+          <Box sx={{ textAlign: "center", margin: "10px" }}>
+            <Button
+              variant="contained"
+              onClick={handleMoreClick}
+              color="inherit"
+            >
+              더보기
+            </Button>
+          </Box>
+        )}
       </List>
     </>
   );
