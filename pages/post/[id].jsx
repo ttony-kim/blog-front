@@ -1,4 +1,5 @@
 import { Box, Button, Divider, Paper, Typography } from "@mui/material";
+import { STATIC_STATUS_PAGES } from "next/dist/shared/lib/constants";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 
@@ -24,6 +25,19 @@ export default function PostDetail() {
         });
       });
   }, [id]);
+
+  const handleDelete = async () => {
+    if (confirm("삭제하시겠습니까?")) {
+      await fetch(`/api/posts/${id}`, { method: "delete" }).then(
+        ({ status }) => {
+          if (status === 200) {
+            alert("삭제되었습니다.");
+            router.push("/post");
+          }
+        }
+      );
+    }
+  };
 
   useEffect(() => {
     if (router.isReady) {
@@ -52,6 +66,9 @@ export default function PostDetail() {
           color="inherit"
         >
           수정
+        </Button>
+        <Button variant="contained" onClick={handleDelete} color="inherit">
+          삭제
         </Button>
         <Button onClick={() => router.push("/post")} color="inherit">
           목록
