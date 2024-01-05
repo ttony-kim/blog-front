@@ -1,29 +1,24 @@
-import { Box } from "@mui/material";
-import Header from "../component/layout/header";
-import Footer from "../component/layout/footer";
+import Footer from "@component/layout/footer";
+import Header from "@component/layout/header";
+import Menu from "@component/layout/menu";
 
+import Contents from "@component/layout/contents";
+import styles from "@styles/Layout.module.css";
+import "@styles/editor.css";
+import "@styles/globals.css";
+import "@styles/tiptap.css";
 import "remixicon/fonts/remixicon.css";
-import "../styles/globals.css";
-import "../styles/tiptap.css";
-import "../styles/editor.css";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
+    <div className={styles.container}>
       <Header />
-      <Box
-        sx={{
-          width: 800,
-          margin: "auto",
-          minHeight: "750px",
-          height: "auto",
-          paddingBottom: "60px",
-        }}
-      >
-        <Component {...pageProps} />
-      </Box>
+      <div className={styles.body}>
+        <Contents Component={Component} pageProps={pageProps} />
+        <Menu />
+      </div>
       <Footer />
-    </>
+    </div>
   );
 }
 

@@ -1,17 +1,9 @@
-import { Box } from "@mui/material";
+import styles from "@styles/Layout.module.css";
 
 export default function Footer() {
   return (
-    <Box
-      sx={{
-        height: "60px",
-        position: "relative",
-        transform: "translateY(0%)",
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
+    <div className={styles.footer}>
       <span>Footer</span>
-    </Box>
+    </div>
   );
 }

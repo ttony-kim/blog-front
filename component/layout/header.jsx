@@ -1,18 +1,45 @@
-import { Box } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  Menu,
+  MenuItem,
+  Select,
+} from "@mui/material";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+import styles from "@styles/Layout.module.css";
 
 export default function Header() {
+  const [data, setData] = useState([{ id: 100, name: "전체" }]);
+
+  const getCategory = async () => {
+    await fetch(`/api/categories/all`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`${res.status} 에러가 발생했습니다.`);
+        }
+        return res.json();
+      })
+      .then((json) => {
+        setData((prev) => [...prev, ...json]);
+      });
+  };
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
   return (
-    <Box sx={{ height: 70, position: "relative" }}>
-      <span
-        style={{
-          position: "absolute",
-          textAlign: "center",
-          left: "50%",
-          top: "50%",
-        }}
-      >
-        BLOG
-      </span>
-    </Box>
+    <div className={styles.header}>
+      <Box sx={{ marginRight: "auto" }}>
+        <span>logo</span>
+      </Box>
+      <Box>
+        <span>BLOG</span>
+      </Box>
+      <Box sx={{ marginLeft: "auto" }}></Box>
+    </div>
   );
 }
