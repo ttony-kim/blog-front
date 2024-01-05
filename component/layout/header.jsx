@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import styles from "@styles/Layout.module.css";
+import Link from "next/link";
 
 export default function Header() {
   const [data, setData] = useState([{ id: 100, name: "전체" }]);
@@ -37,7 +38,9 @@ export default function Header() {
         <span>logo</span>
       </Box>
       <Box>
-        <span>BLOG</span>
+        <Link href="/post">
+          <span>BLOG</span>
+        </Link>
       </Box>
       <Box sx={{ marginLeft: "auto" }}></Box>
     </div>
