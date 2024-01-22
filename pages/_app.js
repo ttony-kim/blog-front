@@ -15,7 +15,6 @@ function MyApp({ Component, pageProps }) {
       <Header />
       <div className={styles.body}>
         <Contents Component={Component} pageProps={pageProps} />
-        <Menu />
       </div>
       <Footer />
     </div>
