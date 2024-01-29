@@ -1,19 +1,13 @@
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Select,
-} from "@mui/material";
-import Image from "next/image";
+import { FormControl, MenuItem, Select } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import styles from "@styles/Layout.module.css";
-import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Header() {
   const [data, setData] = useState([{ id: 100, name: "전체" }]);
+  const [category, setCategory] = useState(100);
+  const router = useRouter();
 
   const getCategory = async () => {
     await fetch(`/api/categories/all`)
@@ -28,21 +22,41 @@ export default function Header() {
       });
   };
 
+  const handleChange = (event) => {
+    setCategory(event.target.value);
+    router.push({
+      pathname: "/post",
+      query: { categoryId: event.target.value },
+    });
+  };
+
   useEffect(() => {
     getCategory();
   }, []);
 
   return (
     <div className={styles.header}>
-      <Box sx={{ marginRight: "auto" }}>
-        <span>logo</span>
-      </Box>
-      <Box>
-        <Link href="/post">
-          <span>BLOG</span>
-        </Link>
-      </Box>
-      <Box sx={{ marginLeft: "auto" }}></Box>
+      <div>a</div>
+      <div>b</div>
+      <div>
+        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+          <Select
+            id="categroy"
+            value={category}
+            sx={{ color: "red" }}
+            onChange={handleChange}
+          >
+            {data &&
+              data.map((item) => {
+                return (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.name}
+                  </MenuItem>
+                );
+              })}
+          </Select>
+        </FormControl>
+      </div>
     </div>
   );
 }
