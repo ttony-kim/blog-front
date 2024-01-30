@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import styles from "@styles/Layout.module.css";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function Header() {
   const [data, setData] = useState([{ id: 100, name: "전체" }]);
@@ -37,7 +38,9 @@ export default function Header() {
   return (
     <div className={styles.header}>
       <div>a</div>
-      <div>b</div>
+      <div>
+        <Link href="/post">Blog</Link>
+      </div>
       <div>
         <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
           <Select
