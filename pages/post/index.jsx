@@ -80,14 +80,15 @@ export default function Post() {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <span>Category ({data.count})</span>
+      {/* <Box
+      // sx={{ display: "flex", justifyContent: "space-between" }}
+      >
         <Link href="/post/register">
           <IconButton aria-label="delete">
             <EditOutlinedIcon />
           </IconButton>
         </Link>
-      </Box>
+      </Box> */}
       <Divider />
       <List>
         {data.list.map((post) => (

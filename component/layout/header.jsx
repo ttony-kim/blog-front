@@ -4,12 +4,14 @@ import {
   Button,
   Divider,
   FormControl,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
   MenuItem,
   Select,
+  Stack,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
@@ -85,90 +87,104 @@ export default function Header() {
     getCategoryList();
   }, []);
 
+  const clickTest = () => {
+    console.log("clickTes");
+  };
+
   return (
     <div className={styles.header}>
-      <div style={{ position: "relative", float: "left" }}>
-        <Avatar sx={{ float: "left", marginRight: "16px" }}>DS</Avatar>
-        <Box sx={{ float: "left" }}>
+      <Stack direction="row">
+        <IconButton onClick={clickTest}>
+          <Avatar>DS</Avatar>
+        </IconButton>
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="flex-start"
+          // position="relative"
+        >
           <Button
             onClick={handleButtonClick}
-            sx={{ padding: 0, minWidth: 0, lineHeight: 0 }}
+            sx={{ padding: 0, lineHeight: 1, minWidth: 0 }}
           >
             Hello
           </Button>
-          {isVisible && (
-            <Box
-              sx={{
-                width: "70%",
-                maxWidth: 360,
-                bgcolor: "background.paper",
-                position: "absolute",
-                border: "1px solid red",
-              }}
-            >
-              <List>
-                <ListItem disablePadding>
-                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
-                    <ListItemText
-                      primary="관리"
-                      primaryTypographyProps={{
-                        color: "primary",
-                        fontSize: 12,
-                        textAlign: "center",
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
-                    <ListItemText
-                      primary="글쓰기"
-                      primaryTypographyProps={{
-                        color: "primary",
-                        fontSize: 12,
-                        textAlign: "center",
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                <Divider />
-                <ListItem disablePadding>
-                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
-                    <ListItemText
-                      primary="로그인/로그아웃"
-                      primaryTypographyProps={{
-                        color: "primary",
-                        fontSize: 12,
-                        textAlign: "center",
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            </Box>
-          )}
-          <p style={{ fontSize: "12px", margin: 0 }}>아무거나 블로그입니다.</p>
+          {/* {isVisible && ( */}
+          <Box
+            sx={{
+              width: "70%",
+              maxWidth: 360,
+              bgcolor: "background.paper",
+              // position: "absolute",
+              border: "1px solid red",
+            }}
+          >
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                  <ListItemText
+                    primary="관리"
+                    primaryTypographyProps={{
+                      color: "primary",
+                      fontSize: 12,
+                      textAlign: "center",
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+              <ListItem disablePadding>
+                <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                  <ListItemText
+                    primary="글쓰기"
+                    primaryTypographyProps={{
+                      color: "primary",
+                      fontSize: 12,
+                      textAlign: "center",
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              <Divider />
+              <ListItem disablePadding>
+                <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                  <ListItemText
+                    primary="로그인/로그아웃"
+                    primaryTypographyProps={{
+                      color: "primary",
+                      fontSize: 12,
+                      textAlign: "center",
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </Box>
+          {/* )} */}
+          <p style={{ fontSize: "11px", margin: 0 }}>아무거나 블로그입니다.</p>
         </Box>
+      </Stack>
+      <div>
+        {selectedCategory.id > 0 &&
+          `${selectedCategory.name} (${selectedCategory.postCount})`}
       </div>
       <div>
-        <Link href="/post">
-          {selectedCategory.id > 0 &&
-            `${selectedCategory.name} (${selectedCategory.postCount})`}
-        </Link>
-      </div>
-      <div>
-        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+        <FormControl sx={{ m: 0, minWidth: 120 }} size="small">
           <Select
             id="categroy"
             value={selectedCategory.id}
-            sx={{ color: "red" }}
+            sx={{ color: "red", fontSize: "small" }}
             onChange={handleSelectChange}
           >
             {categories &&
               categories.map((item) => {
                 return (
-                  <MenuItem key={item.id} value={item.id}>
+                  <MenuItem
+                    key={item.id}
+                    value={item.id}
+                    sx={{ fontSize: "small" }}
+                  >
                     {item.name}
                   </MenuItem>
                 );
