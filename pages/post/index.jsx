@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import { codeData as code } from "data/codeData";
 
 export default function Post() {
   const [data, setData] = useState({ count: 0, list: [], last: true });
@@ -19,13 +20,13 @@ export default function Post() {
   const router = useRouter();
   const { query } = router;
 
+  // Post 목록 조회
   const getPostData = async () => {
     const queryString = new URLSearchParams(pageData.current);
     const categoryId = query.categoryId;
 
     // Category Id가 존재 할때
-    if (categoryId != undefined && categoryId != 100) {
-      // 이후 조건 수정 필요
+    if (categoryId != undefined && categoryId != code.all.value) {
       queryString.append("categoryId", categoryId);
     }
 
