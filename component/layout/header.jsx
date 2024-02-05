@@ -87,14 +87,10 @@ export default function Header() {
     getCategoryList();
   }, []);
 
-  const clickTest = () => {
-    console.log("clickTes");
-  };
-
   return (
     <div className={styles.header}>
       <Stack direction="row">
-        <IconButton onClick={clickTest}>
+        <IconButton onClick={() => router.push("/")}>
           <Avatar>DS</Avatar>
         </IconButton>
         <Box
@@ -102,7 +98,6 @@ export default function Header() {
           flexDirection="column"
           justifyContent="center"
           alignItems="flex-start"
-          // position="relative"
         >
           <Button
             onClick={handleButtonClick}
@@ -110,67 +105,70 @@ export default function Header() {
           >
             Hello
           </Button>
-          {/* {isVisible && ( */}
-          <Box
-            sx={{
-              width: "70%",
-              maxWidth: 360,
-              bgcolor: "background.paper",
-              // position: "absolute",
-              border: "1px solid red",
-            }}
-          >
-            <List>
-              <ListItem disablePadding>
-                <ListItemButton sx={{ py: 0, minHeight: 19 }}>
-                  <ListItemText
-                    primary="관리"
-                    primaryTypographyProps={{
-                      color: "primary",
-                      fontSize: 12,
-                      textAlign: "center",
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-              <Divider />
-              <ListItem disablePadding>
-                <ListItemButton sx={{ py: 0, minHeight: 19 }}>
-                  <ListItemText
-                    primary="글쓰기"
-                    primaryTypographyProps={{
-                      color: "primary",
-                      fontSize: 12,
-                      textAlign: "center",
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-              <Divider />
-              <ListItem disablePadding>
-                <ListItemButton sx={{ py: 0, minHeight: 19 }}>
-                  <ListItemText
-                    primary="로그인/로그아웃"
-                    primaryTypographyProps={{
-                      color: "primary",
-                      fontSize: 12,
-                      textAlign: "center",
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </Box>
-          {/* )} */}
+          {isVisible && (
+            <Box
+              sx={{
+                top: 40,
+                width: "70%",
+                maxWidth: 100,
+                bgcolor: "background.paper",
+                position: "absolute",
+                border: "1px solid red",
+              }}
+            >
+              <List>
+                <ListItem disablePadding>
+                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                    <ListItemText
+                      primary="관리"
+                      primaryTypographyProps={{
+                        color: "primary",
+                        fontSize: 12,
+                        textAlign: "center",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                <Divider />
+                <ListItem disablePadding>
+                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                    <ListItemText
+                      primary="글쓰기"
+                      primaryTypographyProps={{
+                        color: "primary",
+                        fontSize: 12,
+                        textAlign: "center",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                <Divider />
+                <ListItem disablePadding>
+                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                    <ListItemText
+                      primary="로그인/로그아웃"
+                      primaryTypographyProps={{
+                        color: "primary",
+                        fontSize: 12,
+                        textAlign: "center",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </Box>
+          )}
           <p style={{ fontSize: "11px", margin: 0 }}>아무거나 블로그입니다.</p>
         </Box>
       </Stack>
-      <div>
-        {selectedCategory.id > 0 &&
-          `${selectedCategory.name} (${selectedCategory.postCount})`}
-      </div>
-      <div>
-        <FormControl sx={{ m: 0, minWidth: 120 }} size="small">
+      <Box sx={{ m: "0 auto" }}>
+        <p>
+          {selectedCategory.id > 0 &&
+            `${selectedCategory.name} (${selectedCategory.postCount})`}
+        </p>
+      </Box>
+      <Stack direction="row" alignItems="center">
+        <FormControl sx={{ minWidth: 120 }} size="small">
           <Select
             id="categroy"
             value={selectedCategory.id}
@@ -191,7 +189,7 @@ export default function Header() {
               })}
           </Select>
         </FormControl>
-      </div>
+      </Stack>
     </div>
   );
 }
