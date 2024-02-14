@@ -1,17 +1,15 @@
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import {
   Box,
   Button,
   Divider,
-  IconButton,
   List,
   ListItem,
   ListItemText,
+  Typography,
 } from "@mui/material";
-import Link from "next/link";
+import { codeData as code } from "data/codeData";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { codeData as code } from "data/codeData";
 
 export default function Post() {
   const [data, setData] = useState({ count: 0, list: [], last: true });
@@ -80,27 +78,40 @@ export default function Post() {
 
   return (
     <>
-      {/* <Box
-      // sx={{ display: "flex", justifyContent: "space-between" }}
-      >
-        <Link href="/post/register">
-          <IconButton aria-label="delete">
-            <EditOutlinedIcon />
-          </IconButton>
-        </Link>
-      </Box> */}
       <Divider />
-      <List>
+      <List pt="0">
         {data.list.map((post) => (
           <Box key={post.id}>
             <ListItem onClick={() => router.push(`/post/${post.id}`)}>
-              <ListItemText primary={post.title} secondary={post.content} />
+              <ListItemText
+                primary={post.title}
+                secondary={
+                  <div>
+                    <Typography
+                      component="p"
+                      variant="body2"
+                      sx={{
+                        lineHeight: "1.5",
+                        minHeight: "3.5em",
+                        maxHeight: "3.5em",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {post.content}
+                    </Typography>
+                    <Typography component="p" variant="caption">
+                      {post.categoryName} · {post.createdDate}
+                    </Typography>
+                  </div>
+                }
+              />
             </ListItem>
             <Divider />
           </Box>
         ))}
         {!data.last && (
-          <Box sx={{ textAlign: "center", margin: "10px" }}>
+          <Box mt="10px" sx={{ textAlign: "center" }}>
             <Button
               variant="contained"
               onClick={handleMoreClick}
