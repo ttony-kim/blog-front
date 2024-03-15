@@ -20,7 +20,7 @@
 .body {
   flex: 1; /* 남은 공간을 채우도록 설정 */
   padding: 20px;
-  padding-top: 100px;
+  padding-top: 130px;
 }
 
 .contents {

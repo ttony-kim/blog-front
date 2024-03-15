@@ -1,7 +1,10 @@
+// libraries
 import { Box, Button, TextField } from "@mui/material";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import Editor from "../../component/editor";
+
+// components
+import Editor from "@component/editor";
 
 export default function PostEdit() {
   const router = useRouter();

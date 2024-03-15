@@ -1,3 +1,4 @@
+// libraries
 import {
   Button,
   Dialog,
@@ -9,6 +10,7 @@ import {
 import { useState } from "react";
 
 export default function ImageDialog({ open, handleClose, handleImageUpload }) {
+  // image url 상태 값
   const [url, setUrl] = useState("");
 
   return (

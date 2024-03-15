@@ -10,6 +10,7 @@ import {
 import { codeData as code } from "data/codeData";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import moment from "moment";
 
 export default function Post() {
   const [data, setData] = useState({ count: 0, list: [], last: true });
@@ -101,7 +102,8 @@ export default function Post() {
                       {post.content}
                     </Typography>
                     <Typography component="p" variant="caption">
-                      {post.categoryName} · {post.createdDate}
+                      {post.categoryName} ·{" "}
+                      {moment(post.createdDate).format("YYYY.MM.DD")}
                     </Typography>
                   </div>
                 }

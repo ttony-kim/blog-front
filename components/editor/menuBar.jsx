@@ -1,4 +1,6 @@
+// libraries
 import { Fragment, useCallback, useState } from "react";
+// components
 import MenuItem from "./menuItem";
 import ImageDialog from "./imageDialog";
 
@@ -6,14 +8,15 @@ export default function MenuBar({ editor }) {
   // image Dialog 상태 값
   const [open, setOpen] = useState(false);
 
+  // image Dialog 닫기
   const handleClose = () => {
     setOpen(false);
   };
 
+  // image editor에 upload
   const handleImageUpload = useCallback(
     (url) => {
       handleClose();
-      console.log(url);
       if (url) {
         editor.chain().focus().setImage({ src: url }).run();
       }
@@ -21,6 +24,7 @@ export default function MenuBar({ editor }) {
     [editor]
   );
 
+  // editor 메뉴 bar 항목
   const items = [
     {
       icon: "bold",

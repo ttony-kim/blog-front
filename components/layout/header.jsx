@@ -1,3 +1,4 @@
+// libraries
 import {
   Avatar,
   Box,
@@ -14,10 +15,10 @@ import {
   Stack,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-
-import styles from "@styles/Layout.module.css";
 import { useRouter } from "next/router";
-import Link from "next/link";
+// custom css
+import styles from "@styles/Layout.module.css";
+// common code data
 import { codeData as code } from "data/codeData";
 
 export default function Header() {
@@ -139,6 +140,7 @@ export default function Header() {
                         fontSize: 12,
                         textAlign: "center",
                       }}
+                      onClick={() => router.push("/post/register")}
                     />
                   </ListItemButton>
                 </ListItem>
