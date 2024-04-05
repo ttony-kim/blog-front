@@ -8,20 +8,21 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Editor from "@component/editor";
+import Editor from "@component/Editor";
 import { codeData as code } from "data/codeData";
 
 export default function PostRegister() {
+  const router = useRouter();
+
   // 카테고리 목록
   const [categories, setCategories] = useState([
     { id: code.none.value, name: code.none.text },
   ]);
+  // post content, title
+  const [data, setData] = useState();
+  const [title, setTitle] = useState("");
   // 선택된 카테고리 정보
-  const [selectedCategory, setSelectedCategory] = useState({
-    id: -1,
-    name: "",
-    postCount: 0,
-  });
+  const [categoryId, setCategoryId] = useState(-1);
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
@@ -37,17 +38,13 @@ export default function PostRegister() {
       });
   };
 
-  const router = useRouter();
-
-  const [data, setData] = useState();
-  const [title, setTitle] = useState("");
-
-  const onClick = async () => {
+  // post 저장 event
+  const handleSaveButton = async () => {
     if (confirm("저장하시겠습니까?")) {
       await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content: data }),
+        body: JSON.stringify({ title, content: data, categoryId }),
       }).then(({ status }) => {
         if (status === 200) {
           alert("저장되었습니다.");
@@ -57,22 +54,16 @@ export default function PostRegister() {
     }
   };
 
-  const onChange = (e) => {
+  // 타이틀 select 선택 시 change event
+  const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
 
-  // 카테고리 Select 선택 시 Change event
-  const handleSelectChange = (event) => {
+  // 카테고리 select 선택 시 change event
+  const handleCategoryChange = (event) => {
     const categoryId = event.target.value;
-    const { name } = categories.find((data) => data.id == categoryId);
 
-    setSelectedCategory((prev) => ({ ...prev, id: categoryId, name }));
-    getPostCount(categoryId);
-
-    router.push({
-      pathname: "/post",
-      query: { categoryId },
-    });
+    setCategoryId(categoryId);
   };
 
   useEffect(() => {
@@ -85,8 +76,8 @@ export default function PostRegister() {
         <FormControl size="small" sx={{ minWidth: 200 }}>
           <Select
             id="categroy"
-            value={selectedCategory.id}
-            onChange={handleSelectChange}
+            value={categoryId}
+            onChange={handleCategoryChange}
           >
             {categories &&
               categories.map((item) => {
@@ -108,7 +99,7 @@ export default function PostRegister() {
           fullWidth
           id="title"
           variant="standard"
-          onChange={onChange}
+          onChange={handleTitleChange}
           placeholder="Title"
           error={title === ""}
           helperText={title === "" ? "Title을 입력해주세요." : ""}
@@ -116,7 +107,7 @@ export default function PostRegister() {
       </Box>
       <Editor setData={setData} />
       <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
-        <Button variant="contained" onClick={onClick} color="inherit">
+        <Button variant="contained" onClick={handleSaveButton} color="inherit">
           완료
         </Button>
       </Box>

@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 
 // components
-import Editor from "@component/editor";
+import Editor from "@component/Editor";
 
 export default function PostEdit() {
   const router = useRouter();

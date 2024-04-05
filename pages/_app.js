@@ -1,8 +1,7 @@
-import Footer from "@component/layout/footer";
-import Header from "@component/layout/header";
-import Menu from "@component/layout/menu";
+import Footer from "@component/Layout/Footer";
+import Header from "@component/Layout/Header";
 
-import Contents from "@component/layout/contents";
+import Contents from "@component/Layout/Contents";
 import styles from "@styles/Layout.module.css";
 import "@styles/editor.css";
 import "@styles/globals.css";

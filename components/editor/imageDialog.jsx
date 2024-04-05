@@ -9,14 +9,18 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
-export default function ImageDialog({ open, handleClose, handleImageUpload }) {
+export default function ImageDialog({
+  open,
+  handleCloseClick,
+  handleImageUpload,
+}) {
   // image url 상태 값
   const [url, setUrl] = useState("");
 
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={handleCloseClick}
       PaperProps={{
         sx: {
           minWidth: "30%",
@@ -38,7 +42,7 @@ export default function ImageDialog({ open, handleClose, handleImageUpload }) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleClose()}>Cancel</Button>
+        <Button onClick={() => handleCloseClick()}>Cancel</Button>
         <Button onClick={() => handleImageUpload(url)}>Add</Button>
       </DialogActions>
     </Dialog>

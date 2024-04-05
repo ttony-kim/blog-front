@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export default function PostDetail() {
   const router = useRouter();
+
   // post id 값
   const id = router.query.id;
   // post 상세 정보
@@ -49,10 +50,6 @@ export default function PostDetail() {
         }
       );
     }
-  };
-
-  const test = () => {
-    console.log("test");
   };
 
   useEffect(() => {

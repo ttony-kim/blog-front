@@ -13,18 +13,20 @@ import { useEffect, useRef, useState } from "react";
 import moment from "moment";
 
 export default function Post() {
-  const [data, setData] = useState({ count: 0, list: [], last: true });
-  const pageData = useRef({ page: 0, size: 5 });
-
   const router = useRouter();
   const { query } = router;
 
-  // Post 목록 조회
+  // post 목록 데이터(count: 전체 목록, list: post 목록, last: 마지막 페이지이지 여부)
+  const [data, setData] = useState({ count: 0, list: [], last: true });
+  // page 정보
+  const pageData = useRef({ page: 0, size: 5 });
+
+  // post 목록 조회
   const getPostData = async () => {
     const queryString = new URLSearchParams(pageData.current);
     const categoryId = query.categoryId;
 
-    // Category Id가 존재 할때
+    // categoryId가 존재 할때
     if (categoryId != undefined && categoryId != code.all.value) {
       queryString.append("categoryId", categoryId);
     }
@@ -44,7 +46,7 @@ export default function Post() {
     return resultData;
   };
 
-  // 초기 데이터 조회 및 Category Id 변경됐을 경우 실행
+  // 초기 데이터 조회 및 category id 변경됐을 경우 실행
   const init = async () => {
     // 페이지 0으로 초기화
     pageData.current.page = 0;

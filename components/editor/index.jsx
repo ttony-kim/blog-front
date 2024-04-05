@@ -8,7 +8,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect } from "react";
 // components
-import MenuBar from "./menuBar";
+import MenuBar from "./MenuBar";
 
 export default function Editor({ data, setData }) {
   // editor 생성

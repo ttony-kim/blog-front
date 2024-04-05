@@ -22,6 +22,8 @@ import styles from "@styles/Layout.module.css";
 import { codeData as code } from "data/codeData";
 
 export default function Header() {
+  const router = useRouter();
+
   // 카테고리 목록
   const [categories, setCategories] = useState([
     { id: code.all.value, name: code.all.text },
@@ -34,8 +36,6 @@ export default function Header() {
   });
   // 관리 메뉴 visible 여부
   const [isVisible, setIsVisible] = useState(false);
-
-  const router = useRouter();
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
@@ -51,7 +51,7 @@ export default function Header() {
       });
   };
 
-  // 카테고리 별 Post Count 조회
+  // 카테고리 별 post count 조회
   const getPostCount = async (categoryId) => {
     await fetch(`/api/posts/category/${categoryId}/count`)
       .then((res) => {
@@ -65,8 +65,8 @@ export default function Header() {
       });
   };
 
-  // 카테고리 Select 선택 시 Change event
-  const handleSelectChange = (event) => {
+  // 카테고리 select 선택 시 change event
+  const handleCategoryChange = (event) => {
     const categoryId = event.target.value;
     const { name } = categories.find((data) => data.id == categoryId);
 
@@ -79,8 +79,8 @@ export default function Header() {
     });
   };
 
-  // 관리 메뉴 버튼 Click event
-  const handleButtonClick = () => {
+  // 관리 메뉴 버튼 click event
+  const handleNavMenuClick = () => {
     setIsVisible((prev) => !prev);
   };
 
@@ -101,7 +101,7 @@ export default function Header() {
           alignItems="flex-start"
         >
           <Button
-            onClick={handleButtonClick}
+            onClick={handleNavMenuClick}
             sx={{ padding: 0, lineHeight: 1, minWidth: 0 }}
           >
             Hello
@@ -175,7 +175,7 @@ export default function Header() {
             id="categroy"
             value={selectedCategory.id}
             sx={{ color: "red", fontSize: "small" }}
-            onChange={handleSelectChange}
+            onChange={handleCategoryChange}
           >
             {categories &&
               categories.map((item) => {
