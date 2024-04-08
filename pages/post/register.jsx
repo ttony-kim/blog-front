@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   MenuItem,
   Select,
   TextField,
@@ -23,6 +24,9 @@ export default function PostRegister() {
   const [title, setTitle] = useState("");
   // 선택된 카테고리 정보
   const [categoryId, setCategoryId] = useState(-1);
+  // error 메세지
+  const [titleError, setTitleError] = useState("");
+  const [categoryError, setCategoryError] = useState("");
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
@@ -40,6 +44,11 @@ export default function PostRegister() {
 
   // post 저장 event
   const handleSaveButton = async () => {
+    // validation check
+    if (!validate()) {
+      return false;
+    }
+
     if (confirm("저장하시겠습니까?")) {
       await fetch("/api/posts", {
         method: "POST",
@@ -52,6 +61,28 @@ export default function PostRegister() {
         }
       });
     }
+  };
+
+  // validation check
+  const validate = () => {
+    let returnValue = true;
+    // title 유효성 검사
+    if (!!!title?.trim()) {
+      setTitleError("Title을 입력하세요.");
+      returnValue = false;
+    } else {
+      setTitleError("");
+    }
+
+    // 카테고리 유효성 검사
+    if (categoryId === code.none.value || !!!categoryId) {
+      setCategoryError("카테고리를 선택하세요.");
+      returnValue = false;
+    } else {
+      setCategoryError("");
+    }
+
+    return returnValue;
   };
 
   // 타이틀 select 선택 시 change event
@@ -73,7 +104,7 @@ export default function PostRegister() {
   return (
     <>
       <Box sx={{ minWidth: 120 }}>
-        <FormControl size="small" sx={{ minWidth: 200 }}>
+        <FormControl size="small" sx={{ minWidth: 200 }} error={categoryError}>
           <Select
             id="categroy"
             value={categoryId}
@@ -92,6 +123,7 @@ export default function PostRegister() {
                 );
               })}
           </Select>
+          <FormHelperText>{categoryError}</FormHelperText>
         </FormControl>
       </Box>
       <Box m="10px">
@@ -101,8 +133,8 @@ export default function PostRegister() {
           variant="standard"
           onChange={handleTitleChange}
           placeholder="Title"
-          error={title === ""}
-          helperText={title === "" ? "Title을 입력해주세요." : ""}
+          error={titleError !== "" || false}
+          helperText={titleError}
         />
       </Box>
       <Editor setData={setData} />

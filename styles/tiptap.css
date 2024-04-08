@@ -128,6 +128,10 @@ h6 {
   outline: none;
 }
 
+.tiptap.ProseMirror {
+  height: 90%;
+}
+
 .is-active {
   background: black;
   color: white;
