@@ -1,3 +1,4 @@
+// libraries
 import {
   Box,
   Button,
@@ -9,7 +10,9 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+// components
 import Editor from "@component/Editor";
+// common code data
 import { codeData as code } from "data/codeData";
 
 export default function PostRegister() {
@@ -85,16 +88,16 @@ export default function PostRegister() {
     return returnValue;
   };
 
-  // 타이틀 select 선택 시 change event
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
-
   // 카테고리 select 선택 시 change event
   const handleCategoryChange = (event) => {
     const categoryId = event.target.value;
 
     setCategoryId(categoryId);
+  };
+
+  // 타이틀 입력 시 change event
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
   };
 
   useEffect(() => {
