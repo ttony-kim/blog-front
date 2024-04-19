@@ -1,3 +1,4 @@
+// libraries
 import {
   Box,
   Button,
@@ -7,10 +8,11 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { codeData as code } from "data/codeData";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import moment from "moment";
+// common code data
+import { codeData as code } from "data/codeData";
 
 export default function Post() {
   const router = useRouter();
@@ -74,6 +76,11 @@ export default function Post() {
     }));
   };
 
+  // html 태그 제거 함수
+  const removeTags = (str) => {
+    return str.replace(/<[^>]*>/g, "");
+  };
+
   useEffect(() => {
     if (!router.isReady) return;
     init();
@@ -101,7 +108,7 @@ export default function Post() {
                         textOverflow: "ellipsis",
                       }}
                     >
-                      {post.content}
+                      {removeTags(post.content)}
                     </Typography>
                     <Typography component="p" variant="caption">
                       {post.categoryName} ·{" "}

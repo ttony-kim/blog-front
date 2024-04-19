@@ -84,6 +84,12 @@ export default function Header() {
     setIsVisible((prev) => !prev);
   };
 
+  // 관리 메뉴 아이템 버튼 click event
+  const handleNavMenuItemClick = (url) => {
+    router.push(url);
+    handleNavMenuClick();
+  };
+
   useEffect(() => {
     getCategoryList();
   }, []);
@@ -102,7 +108,7 @@ export default function Header() {
         >
           <Button
             onClick={handleNavMenuClick}
-            sx={{ padding: 0, lineHeight: 1, minWidth: 0 }}
+            sx={{ padding: 0, lineHeight: 1, minWidth: 0, color: "#666" }}
           >
             Hello
           </Button>
@@ -114,7 +120,7 @@ export default function Header() {
                 maxWidth: 100,
                 bgcolor: "background.paper",
                 position: "absolute",
-                border: "1px solid red",
+                border: "1px solid #ebebeb",
               }}
             >
               <List>
@@ -126,6 +132,7 @@ export default function Header() {
                         color: "primary",
                         fontSize: 12,
                         textAlign: "center",
+                        color: "#666",
                       }}
                     />
                   </ListItemButton>
@@ -139,8 +146,9 @@ export default function Header() {
                         color: "primary",
                         fontSize: 12,
                         textAlign: "center",
+                        color: "#666",
                       }}
-                      onClick={() => router.push("/post/register")}
+                      onClick={() => handleNavMenuItemClick("/post/register")}
                     />
                   </ListItemButton>
                 </ListItem>
@@ -153,6 +161,7 @@ export default function Header() {
                         color: "primary",
                         fontSize: 12,
                         textAlign: "center",
+                        color: "#666",
                       }}
                     />
                   </ListItemButton>
@@ -160,7 +169,9 @@ export default function Header() {
               </List>
             </Box>
           )}
-          <p style={{ fontSize: "11px", margin: 0 }}>아무거나 블로그입니다.</p>
+          <p style={{ fontSize: "11px", margin: 0, color: "#aaa" }}>
+            아무거나 블로그입니다.
+          </p>
         </Box>
       </Stack>
       <Box sx={{ m: "0 auto" }}>
@@ -174,7 +185,7 @@ export default function Header() {
           <Select
             id="categroy"
             value={selectedCategory.id}
-            sx={{ color: "red", fontSize: "small" }}
+            sx={{ color: "#666", fontSize: "small" }}
             onChange={handleCategoryChange}
           >
             {categories &&
