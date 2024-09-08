@@ -2,11 +2,10 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow-y: auto;
 }
 
 .header {
-  position: fixed;
+  position: sticky;
   top: 0;
   width: 100%;
   background-color: #fff;
@@ -17,16 +16,21 @@
   justify-content: space-between;
 }
 
-.body {
-  flex: 1; /* 남은 공간을 채우도록 설정 */
+.mainWrapper {
+  flex: 1;
+  overflow: auto;
+  padding-bottom: 60px; /* footer 높이만큼 여백 추가 */
+}
+
+.main {
   padding: 20px;
-  padding-top: 130px;
+  padding-top: 30px;
 }
 
 .contents {
-  margin: 0 auto; /* 가운데 정렬을 위해 margin 사용 */
-  max-width: 800px; /* 최대 너비 설정 (예시 값) */
-  padding: 0 20px; /* 양쪽 여백 설정 */
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 0 20px;
 }
 
 .footer {
@@ -34,4 +38,6 @@
   color: #aaa;
   text-align: center;
   padding: 10px;
+  height: 40px; /* footer 높이 지정 */
+  margin-top: auto;
 }

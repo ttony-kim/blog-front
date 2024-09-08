@@ -95,7 +95,7 @@ export default function Header() {
   }, []);
 
   return (
-    <div className={styles.header}>
+    <header className={styles.header}>
       <Stack direction="row">
         <IconButton onClick={() => router.push("/")}>
           <Avatar>DS</Avatar>
@@ -203,6 +203,6 @@ export default function Header() {
           </Select>
         </FormControl>
       </Stack>
-    </div>
+    </header>
   );
 }

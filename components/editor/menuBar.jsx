@@ -2,7 +2,7 @@
 import { Fragment, useCallback, useState } from "react";
 // components
 import MenuItem from "./menuItem";
-import ImageDialog from "./ImageDialog";
+import ImageDialog from "./imageUploadDialog";
 
 export default function MenuBar({ editor }) {
   // image Dialog 상태 값
