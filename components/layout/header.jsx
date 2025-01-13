@@ -36,6 +36,8 @@ export default function Header() {
   });
   // 관리 메뉴 visible 여부
   const [isVisible, setIsVisible] = useState(false);
+  // 로그인 여부
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
@@ -90,8 +92,16 @@ export default function Header() {
     handleNavMenuClick();
   };
 
+  // 로그아웃 event
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+  };
+
   useEffect(() => {
     getCategoryList();
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
   }, []);
 
   return (
@@ -139,7 +149,10 @@ export default function Header() {
                 </ListItem>
                 <Divider />
                 <ListItem disablePadding>
-                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                  <ListItemButton
+                    sx={{ py: 0, minHeight: 19 }}
+                    onClick={() => handleNavMenuItemClick("/post/register")}
+                  >
                     <ListItemText
                       primary="글쓰기"
                       primaryTypographyProps={{
@@ -148,15 +161,21 @@ export default function Header() {
                         textAlign: "center",
                         color: "#666",
                       }}
-                      onClick={() => handleNavMenuItemClick("/post/register")}
                     />
                   </ListItemButton>
                 </ListItem>
                 <Divider />
                 <ListItem disablePadding>
-                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                  <ListItemButton
+                    sx={{ py: 0, minHeight: 19 }}
+                    onClick={() =>
+                      isLoggedIn
+                        ? handleLogout()
+                        : handleNavMenuItemClick("/login")
+                    }
+                  >
                     <ListItemText
-                      primary="로그인/로그아웃"
+                      primary={isLoggedIn ? "로그아웃" : "로그인"}
                       primaryTypographyProps={{
                         color: "primary",
                         fontSize: 12,
