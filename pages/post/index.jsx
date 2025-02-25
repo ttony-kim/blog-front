@@ -13,6 +13,8 @@ import { useEffect, useRef, useState } from "react";
 import moment from "moment";
 // common code data
 import { codeData as code } from "data/codeData";
+// axios
+import axios from "axios";
 
 export default function Post() {
   const router = useRouter();
@@ -33,19 +35,9 @@ export default function Post() {
       queryString.append("categoryId", categoryId);
     }
 
-    const resultData = await fetch(`/api/posts?${queryString.toString()}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        return json;
-      })
-      .catch((error) => console.log(error.message));
+    const { data } = await axios.get(`/api/posts?${queryString.toString()}`);
 
-    return resultData;
+    return data;
   };
 
   // 초기 데이터 조회 및 category id 변경됐을 경우 실행

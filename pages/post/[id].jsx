@@ -5,6 +5,8 @@ import { Box, Divider, IconButton, Paper, Typography } from "@mui/material";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
+// axios
+import axios from "api/axios";
 
 export default function PostDetail() {
   const router = useRouter();
@@ -21,34 +23,21 @@ export default function PostDetail() {
 
   // 초기화 함수, post 상세 정보 조회
   const init = useCallback(async () => {
-    await fetch(`/api/posts/${id}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setData({
-          title: json.title,
-          content: json.content,
-          createdDate: moment(json.createdDate).format("YYYY.M.DD HH:mm"),
-          categoryName: json.categoryName,
-        });
-      });
+    const { data } = await axios.get(`/api/posts/${id}`);
+    setData({
+      title: data.title,
+      content: data.content,
+      createdDate: moment(data.createdDate).format("YYYY.M.DD HH:mm"),
+      categoryName: data.categoryName,
+    });
   }, [id]);
 
   // post 삭제 event
   const handlePostDelete = async () => {
     if (confirm("삭제하시겠습니까?")) {
-      await fetch(`/api/posts/${id}`, { method: "delete" }).then(
-        ({ status }) => {
-          if (status === 200) {
-            alert("삭제되었습니다.");
-            router.push("/post");
-          }
-        }
-      );
+      await axios.delete(`/api/posts/${id}`);
+      alert("삭제되었습니다.");
+      router.push("/post");
     }
   };
 

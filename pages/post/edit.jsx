@@ -14,6 +14,8 @@ import { useCallback, useEffect, useState } from "react";
 import Editor from "@component/Editor";
 // common code data
 import { codeData as code } from "data/codeData";
+// axios
+import axios from "api/axios";
 
 export default function PostEdit() {
   const router = useRouter();
@@ -34,32 +36,17 @@ export default function PostEdit() {
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
-    await fetch(`/api/categories/all`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setCategories((prev) => [...prev, ...json]);
-      });
+    const { data } = await axios.get("/api/categories/all");
+    setCategories((prev) => [...prev, ...data]);
   };
 
   // 초기화 함수, post 상세 정보 조회
   const init = useCallback(async () => {
-    await fetch(`/api/posts/${id}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setTitle(() => json.title);
-        setData(() => json.content);
-        setCategoryId(() => json.categoryId);
-      });
+    const { data } = await axios.get(`/api/posts/${id}`);
+
+    setTitle(() => data.title);
+    setData(() => data.content);
+    setCategoryId(() => data.categoryId);
   }, [id]);
 
   // post 저장 event
@@ -70,16 +57,10 @@ export default function PostEdit() {
     }
 
     if (confirm("저장하시겠습니까?")) {
-      await fetch(`/api/posts/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content: data, categoryId }),
-      }).then(({ status }) => {
-        if (status === 200) {
-          alert("저장되었습니다.");
-          router.push(`/post/${id}`);
-        }
-      });
+      await axios.put(`/api/posts/${id}`, { title, content: data, categoryId });
+
+      alert("저장되었습니다.");
+      router.push(`/post/${id}`);
     }
   };
 

@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import Editor from "@component/Editor";
 // common code data
 import { codeData as code } from "data/codeData";
+// axios
+import axios from "api/axios";
 
 export default function PostRegister() {
   const router = useRouter();
@@ -33,16 +35,8 @@ export default function PostRegister() {
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
-    await fetch(`/api/categories/all`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setCategories((prev) => [...prev, ...json]);
-      });
+    const { data } = await axios.get("/api/categories/all");
+    setCategories((prev) => [...prev, ...data]);
   };
 
   // post 저장 event
@@ -53,16 +47,10 @@ export default function PostRegister() {
     }
 
     if (confirm("저장하시겠습니까?")) {
-      await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content: data, categoryId }),
-      }).then(({ status }) => {
-        if (status === 200) {
-          alert("저장되었습니다.");
-          router.push("/post");
-        }
-      });
+      await axios.post("/api/posts", { title, content: data, categoryId });
+
+      alert("저장되었습니다.");
+      router.push("/post");
     }
   };
 

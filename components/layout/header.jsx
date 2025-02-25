@@ -20,6 +20,8 @@ import { useRouter } from "next/router";
 import styles from "@styles/Layout.module.css";
 // common code data
 import { codeData as code } from "data/codeData";
+// axios
+import axios from "api/axios";
 
 export default function Header() {
   const router = useRouter();
@@ -41,30 +43,14 @@ export default function Header() {
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
-    await fetch(`/api/categories/all`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setCategories((prev) => [...prev, ...json]);
-      });
+    const { data } = await axios.get("/api/categories/all");
+    setCategories((prev) => [...prev, ...data]);
   };
 
   // 카테고리 별 post count 조회
   const getPostCount = async (categoryId) => {
-    await fetch(`/api/posts/category/${categoryId}/count`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setSelectedCategory((prev) => ({ ...prev, postCount: json }));
-      });
+    const { data } = await axios.get(`/api/posts/category/${categoryId}/count`);
+    setSelectedCategory((prev) => ({ ...prev, postCount: data }));
   };
 
   // 카테고리 select 선택 시 change event

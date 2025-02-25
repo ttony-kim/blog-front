@@ -2,6 +2,8 @@ import { useState } from "react";
 import styles from "@styles/Login.module.css";
 import { useRouter } from "next/router";
 import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
+// axios
+import authAxios from "api/authAxios";
 
 const AlertDialog = ({ open, onClose, title }) => (
   <Dialog open={open} onClose={onClose} aria-labelledby="alert-dialog-title">
@@ -28,29 +30,19 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const { data: token } = await authAxios.post("/api/login", {
+        email,
+        password,
       });
 
-      if (response.ok) {
-        const token = await response.text();
-        if (token) {
-          localStorage.setItem("token", token);
-          router.push({ pathname: "/post" });
-        } else {
-          console.error("토큰이 비어있습니다.");
-          setDialogOpen(true);
-        }
+      if (token) {
+        localStorage.setItem("token", token);
+        router.push({ pathname: "/post" });
       } else {
-        // 로그인 실패 처리
-        console.error("로그인 실패:", response.statusText);
+        console.error("토큰이 비어있습니다.");
         setDialogOpen(true);
       }
     } catch (error) {
-      // 네트워크 오류 등의 예외사항
-      console.error("로그인 에러:", error);
       setDialogOpen(true);
     }
   };
