@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 // components
 import Editor from "@component/Editor";
+import AlertDialog from "@component/Component/AlertDialog";
 // common code data
 import { codeData as code } from "data/codeData";
 // axios
@@ -39,6 +40,10 @@ export default function PostRegister() {
     setCategories((prev) => [...prev, ...data]);
   };
 
+  // alert open 여부
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   // post 저장 event
   const handleSaveButton = async () => {
     // validation check
@@ -47,10 +52,15 @@ export default function PostRegister() {
     }
 
     if (confirm("저장하시겠습니까?")) {
-      await axios.post("/api/posts", { title, content: data, categoryId });
+      try {
+        await axios.post("/api/posts", { title, content: data, categoryId });
 
-      alert("저장되었습니다.");
-      router.push("/post");
+        alert("저장되었습니다.");
+        router.push("/post");
+      } catch (error) {
+        setDialogOpen(true);
+        setErrorMessage(error.message);
+      }
     }
   };
 
@@ -134,6 +144,11 @@ export default function PostRegister() {
           완료
         </Button>
       </Box>
+      <AlertDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={errorMessage}
+      />
     </>
   );
 }

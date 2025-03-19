@@ -7,6 +7,8 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 // axios
 import axios from "api/axios";
+// components
+import AlertDialog from "@component/Component/AlertDialog";
 
 export default function PostDetail() {
   const router = useRouter();
@@ -20,6 +22,9 @@ export default function PostDetail() {
     createdDate: "",
     categoryName: "",
   });
+  // alert open 여부
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // 초기화 함수, post 상세 정보 조회
   const init = useCallback(async () => {
@@ -35,9 +40,14 @@ export default function PostDetail() {
   // post 삭제 event
   const handlePostDelete = async () => {
     if (confirm("삭제하시겠습니까?")) {
-      await axios.delete(`/api/posts/${id}`);
-      alert("삭제되었습니다.");
-      router.push("/post");
+      try {
+        await axios.delete(`/api/posts/${id}`);
+        alert("삭제되었습니다.");
+        router.push("/post");
+      } catch (error) {
+        setDialogOpen(true);
+        setErrorMessage(error.message);
+      }
     }
   };
 
@@ -83,6 +93,11 @@ export default function PostDetail() {
           <DeleteIcon />
         </IconButton>
       </Box>
+      <AlertDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={errorMessage}
+      />
     </>
   );
 }

@@ -2,7 +2,7 @@ import axios from "axios";
 
 const instance = axios.create({
   params: {},
-  timeout: 1000,
+  timeout: 60000,
 });
 
 // 요청 인터셉처 추가
@@ -21,10 +21,21 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
-    const { status } = error.response;
-    console.log(`${status} 에러가 발생했습니다.`);
+    let errorMessage = "오류가 발생했습니다.";
 
-    return Promise.reject(error);
+    if (error.response) {
+      const { status } = error.response;
+      console.log(`${status} 에러가 발생했습니다.`);
+
+      if (status === 401) {
+        localStorage.removeItem("token");
+        errorMessage = "접근 권한이 필요합니다. 로그인 후 이용해주세요.";
+      }
+    }
+
+    return Promise.reject({
+      message: errorMessage,
+    });
   }
 );
 

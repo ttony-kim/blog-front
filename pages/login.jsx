@@ -1,20 +1,10 @@
-import { useState } from "react";
 import styles from "@styles/Login.module.css";
 import { useRouter } from "next/router";
-import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
+import { useState } from "react";
 // axios
 import authAxios from "api/authAxios";
-
-const AlertDialog = ({ open, onClose, title }) => (
-  <Dialog open={open} onClose={onClose} aria-labelledby="alert-dialog-title">
-    <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-    <DialogActions>
-      <Button onClick={onClose} autoFocus>
-        닫기
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+// components
+import AlertDialog from "@component/Component/AlertDialog";
 
 export default function Login() {
   const router = useRouter();

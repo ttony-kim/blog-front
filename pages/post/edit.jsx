@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 // components
 import Editor from "@component/Editor";
+import AlertDialog from "@component/Component/AlertDialog";
 // common code data
 import { codeData as code } from "data/codeData";
 // axios
@@ -33,6 +34,9 @@ export default function PostEdit() {
   // error 메세지
   const [titleError, setTitleError] = useState("");
   const [categoryError, setCategoryError] = useState("");
+  // alert open 여부
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
@@ -57,10 +61,19 @@ export default function PostEdit() {
     }
 
     if (confirm("저장하시겠습니까?")) {
-      await axios.put(`/api/posts/${id}`, { title, content: data, categoryId });
+      try {
+        await axios.put(`/api/posts/${id}`, {
+          title,
+          content: data,
+          categoryId,
+        });
 
-      alert("저장되었습니다.");
-      router.push(`/post/${id}`);
+        alert("저장되었습니다.");
+        router.push(`/post/${id}`);
+      } catch (error) {
+        setDialogOpen(true);
+        setErrorMessage(error.message);
+      }
     }
   };
 
@@ -150,6 +163,11 @@ export default function PostEdit() {
           취소
         </Button>
       </Box>
+      <AlertDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        title={errorMessage}
+      />
     </>
   );
 }
