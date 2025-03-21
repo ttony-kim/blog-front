@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "contexts/AuthContext";
 // custom css
 import styles from "@styles/Layout.module.css";
 // common code data
@@ -25,6 +26,7 @@ import axios from "api/axios";
 
 export default function Header() {
   const router = useRouter();
+  const { logout, isLoggedIn } = useAuth();
 
   // 카테고리 목록
   const [categories, setCategories] = useState([
@@ -38,8 +40,6 @@ export default function Header() {
   });
   // 관리 메뉴 visible 여부
   const [isVisible, setIsVisible] = useState(false);
-  // 로그인 여부
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
@@ -78,16 +78,8 @@ export default function Header() {
     handleNavMenuClick();
   };
 
-  // 로그아웃 event
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-  };
-
   useEffect(() => {
     getCategoryList();
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
   }, []);
 
   return (
@@ -120,24 +112,32 @@ export default function Header() {
               }}
             >
               <List>
-                <ListItem disablePadding>
-                  <ListItemButton sx={{ py: 0, minHeight: 19 }}>
-                    <ListItemText
-                      primary="관리"
-                      primaryTypographyProps={{
-                        color: "primary",
-                        fontSize: 12,
-                        textAlign: "center",
-                        color: "#666",
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                <Divider />
+                {isLoggedIn && (
+                  <>
+                    <ListItem disablePadding>
+                      <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                        <ListItemText
+                          primary="관리"
+                          primaryTypographyProps={{
+                            color: "primary",
+                            fontSize: 12,
+                            textAlign: "center",
+                            color: "#666",
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                    <Divider />
+                  </>
+                )}
                 <ListItem disablePadding>
                   <ListItemButton
                     sx={{ py: 0, minHeight: 19 }}
-                    onClick={() => handleNavMenuItemClick("/post/register")}
+                    onClick={() => {
+                      isLoggedIn
+                        ? handleNavMenuItemClick("/post/register")
+                        : handleNavMenuItemClick("/login");
+                    }}
                   >
                     <ListItemText
                       primary="글쓰기"
@@ -155,9 +155,7 @@ export default function Header() {
                   <ListItemButton
                     sx={{ py: 0, minHeight: 19 }}
                     onClick={() =>
-                      isLoggedIn
-                        ? handleLogout()
-                        : handleNavMenuItemClick("/login")
+                      isLoggedIn ? logout() : handleNavMenuItemClick("/login")
                     }
                   >
                     <ListItemText

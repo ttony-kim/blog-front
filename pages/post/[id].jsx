@@ -5,6 +5,7 @@ import { Box, Divider, IconButton, Paper, Typography } from "@mui/material";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "contexts/AuthContext";
 // axios
 import axios from "api/axios";
 // components
@@ -12,6 +13,7 @@ import AlertDialog from "@component/Component/AlertDialog";
 
 export default function PostDetail() {
   const router = useRouter();
+  const { isLoggedIn } = useAuth();
 
   // post id 값
   const id = router.query.id;
@@ -83,16 +85,20 @@ export default function PostDetail() {
           }}
         />
       </Paper>
-      <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
-        <IconButton
-          onClick={() => router.push({ pathname: "/post/edit", query: { id } })}
-        >
-          <ModeIcon />
-        </IconButton>
-        <IconButton onClick={handlePostDelete}>
-          <DeleteIcon />
-        </IconButton>
-      </Box>
+      {isLoggedIn && (
+        <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
+          <IconButton
+            onClick={() =>
+              router.push({ pathname: "/post/edit", query: { id } })
+            }
+          >
+            <ModeIcon />
+          </IconButton>
+          <IconButton onClick={handlePostDelete}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      )}
       <AlertDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}

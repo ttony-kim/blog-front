@@ -1,6 +1,8 @@
+// libraries
 import styles from "@styles/Login.module.css";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useAuth } from "contexts/AuthContext";
 // axios
 import authAxios from "api/authAxios";
 // components
@@ -8,6 +10,7 @@ import AlertDialog from "@component/Component/AlertDialog";
 
 export default function Login() {
   const router = useRouter();
+  const { login } = useAuth();
 
   // 로그인 정보
   const [email, setEmail] = useState("");
@@ -25,14 +28,14 @@ export default function Login() {
         password,
       });
 
-      if (token) {
-        localStorage.setItem("token", token);
-        router.push({ pathname: "/post" });
-      } else {
-        console.error("토큰이 비어있습니다.");
-        setDialogOpen(true);
+      if (!token) {
+        throw new Error("토큰이 비어있습니다.");
       }
+
+      login(token);
+      router.push({ pathname: "/post" });
     } catch (error) {
+      console.error(error?.message || "알 수 없는 오류가 발생했습니다");
       setDialogOpen(true);
     }
   };
