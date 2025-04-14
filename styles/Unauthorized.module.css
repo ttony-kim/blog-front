@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+  background-color: #ffffff;
+  padding-top: 20vh; /* 화면 높이의 15% 만큼 상단 여백 추가 */
+}
+
+.title {
+  font-size: 60px;
+  color: #666666;
+  margin-bottom: 20px;
+}
+
+.messageBox {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.message {
+  font-size: 16px;
+  color: #666666;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+}
+
+.button {
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 18px;
+  color: #ffffff;
+  background-color: #d9d9d9;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #bfbfbf;
+}
+
+.secondaryButton {
+  background-color: #f0f0f0;
+  color: #666666;
+  border: 1px solid #d9d9d9;
+}
+
+.secondaryButton:hover {
+  background-color: #e8e8e8;
+}
