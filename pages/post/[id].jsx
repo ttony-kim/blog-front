@@ -34,7 +34,7 @@ export default function PostDetail() {
     setData({
       title: data.title,
       content: data.content,
-      createdDate: moment(data.createdDate).format("YYYY.M.DD HH:mm"),
+      createdDate: moment(data.createdDate).format("YYYY.MM.DD HH:mm"),
       categoryName: data.categoryName,
     });
   }, [id]);

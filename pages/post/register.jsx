@@ -105,7 +105,11 @@ export default function PostRegister() {
   return (
     <>
       <Box sx={{ minWidth: 120 }}>
-        <FormControl size="small" sx={{ minWidth: 200 }} error={categoryError}>
+        <FormControl
+          size="small"
+          sx={{ minWidth: 200 }}
+          error={!!categoryError}
+        >
           <Select
             id="categroy"
             value={categoryId}

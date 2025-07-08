@@ -164,7 +164,7 @@ export default function MenuBar({ editor }) {
       <ImageDialog
         open={open}
         onCloseClick={handleCloseClick}
-        onUploadClick={handleImageUpload}
+        onImageUpload={handleImageUpload}
       />
     </div>
   );
