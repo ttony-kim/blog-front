@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import nookies from "nookies";
 import { parseJwt } from "utils/jwt";
 import { protectedRoutes } from "data/protectedRoutes";
-import { useRouter } from "next/router";
 
 const AuthContext = createContext(null);
 
@@ -22,8 +23,10 @@ export function AuthProvider({ children }) {
     try {
       const decoded = parseJwt(token);
       const currentTime = Date.now() / 1000;
+
       if (decoded.exp && decoded.exp < currentTime) {
         // 토큰이 만료됐을 경우
+        nookies.destroy(null, "token");
         localStorage.removeItem("token");
         setUser(null);
       } else {
@@ -35,6 +38,7 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error("토큰 파싱 오류:", error);
+      nookies.destroy(null, "token");
       localStorage.removeItem("token");
       setUser(null);
     } finally {
@@ -50,7 +54,9 @@ export function AuthProvider({ children }) {
   }, [loading, user, router]);
 
   const login = (token) => {
+    nookies.set(null, "token", token, { path: "/", maxAge: 60 * 60 * 24 });
     localStorage.setItem("token", token);
+
     const decoded = parseJwt(token);
     setUser({
       id: decoded.email,
@@ -60,6 +66,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    nookies.destroy(null, "token");
     localStorage.removeItem("token");
     setUser(null);
   };

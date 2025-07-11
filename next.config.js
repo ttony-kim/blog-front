@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const API_URL = process.env.API_URL;
+
 const nextConfig = {
   reactStrictMode: false, //true
   swcMinify: true,
@@ -6,7 +8,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: `http://localhost:8084/api/:path*`,
+        destination: `${API_URL}/api/:path*`,
       },
     ];
   },

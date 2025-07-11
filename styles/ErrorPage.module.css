@@ -5,22 +5,22 @@
   justify-content: flex-start;
   height: 100vh;
   background-color: #ffffff;
-  padding-top: 20vh; /* 화면 높이의 15% 만큼 상단 여백 추가 */
+  padding-top: 30vh; /* 화면 높이의 15% 만큼 상단 여백 추가 */
 }
 
 .title {
-  font-size: 60px;
+  font-size: 35px;
   color: #666666;
   margin-bottom: 20px;
 }
 
 .messageBox {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25x;
 }
 
 .message {
-  font-size: 16px;
+  font-size: 13px;
   color: #666666;
 }
 

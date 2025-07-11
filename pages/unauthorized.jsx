@@ -1,5 +1,5 @@
 // libraries
-import styles from "@styles/Unauthorized.module.css";
+import styles from "@styles/ErrorPage.module.css";
 import { useAuth } from "contexts/AuthContext";
 import { useState } from "react";
 import { useRouter } from "next/router";
