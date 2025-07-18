@@ -29,10 +29,15 @@ export default function Post() {
   const getPostData = async () => {
     const queryString = new URLSearchParams(pageData.current);
     const categoryId = query.categoryId;
+    const searchValue = query.searchValue;
 
-    // categoryId가 존재 할때
+    // categoryId가 존재할 때
     if (categoryId != undefined && categoryId != code.all.value) {
       queryString.append("categoryId", categoryId);
+    }
+    // searchValue가 존재할 때
+    if (searchValue != undefined) {
+      queryString.append("searchValue", searchValue);
     }
 
     const { data } = await axios.get(`/api/posts?${queryString.toString()}`);
@@ -82,37 +87,54 @@ export default function Post() {
     <>
       <Divider />
       <List pt="0">
-        {data.list.map((post) => (
-          <Box key={post.id}>
-            <ListItem onClick={() => router.push(`/post/${post.id}`)}>
-              <ListItemText
-                primary={post.title}
-                secondary={
-                  <div>
-                    <Typography
-                      component="p"
-                      variant="body2"
-                      sx={{
-                        lineHeight: "1.5",
-                        minHeight: "3.5em",
-                        maxHeight: "3.5em",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {removeTags(post.content)}
-                    </Typography>
-                    <Typography component="p" variant="caption">
-                      {post.categoryName} ·{" "}
-                      {moment(post.createdDate).format("YYYY.MM.DD")}
-                    </Typography>
-                  </div>
-                }
-              />
-            </ListItem>
-            <Divider />
+        {data.list.length === 0 ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "150px",
+              textAlign: "center",
+              color: "gray",
+            }}
+          >
+            검색결과가 없습니다.
           </Box>
-        ))}
+        ) : (
+          <>
+            {data.list.map((post) => (
+              <Box key={post.id}>
+                <ListItem onClick={() => router.push(`/post/${post.id}`)}>
+                  <ListItemText
+                    primary={post.title}
+                    secondary={
+                      <div>
+                        <Typography
+                          component="p"
+                          variant="body2"
+                          sx={{
+                            lineHeight: "1.5",
+                            minHeight: "3.5em",
+                            maxHeight: "3.5em",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {removeTags(post.content)}
+                        </Typography>
+                        <Typography component="p" variant="caption">
+                          {post.categoryName} ·{" "}
+                          {moment(post.createdDate).format("YYYY.MM.DD")}
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </ListItem>
+                <Divider />
+              </Box>
+            ))}
+          </>
+        )}
         {!data.last && (
           <Box mt="10px" sx={{ textAlign: "center" }}>
             <Button

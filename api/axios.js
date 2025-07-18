@@ -5,7 +5,7 @@ const instance = axios.create({
   timeout: 60000,
 });
 
-// 요청 인터셉처 추가
+// 요청 인터셉터 추가
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -26,6 +26,10 @@ instance.interceptors.response.use(
     if (error.response) {
       const { status } = error.response;
       console.log(`${status} 에러가 발생했습니다.`);
+
+      if (status === 400) {
+        errorMessage = "잘못된 요청입니다.";
+      }
 
       if (status === 401) {
         localStorage.removeItem("token");
