@@ -108,9 +108,9 @@ export default function Post() {
                   <ListItemText
                     primary={post.title}
                     secondary={
-                      <div>
+                      <>
                         <Typography
-                          component="p"
+                          component="span"
                           variant="body2"
                           sx={{
                             lineHeight: "1.5",
@@ -118,15 +118,20 @@ export default function Post() {
                             maxHeight: "3.5em",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
+                            display: "block",
                           }}
                         >
                           {removeTags(post.content)}
                         </Typography>
-                        <Typography component="p" variant="caption">
+                        <Typography
+                          component="span"
+                          variant="caption"
+                          sx={{ display: "block" }}
+                        >
                           {post.categoryName} ·{" "}
                           {moment(post.createdDate).format("YYYY.MM.DD")}
                         </Typography>
-                      </div>
+                      </>
                     }
                   />
                 </ListItem>

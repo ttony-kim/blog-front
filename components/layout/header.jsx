@@ -133,6 +133,12 @@ export default function Header() {
     getCategoryList();
   }, []);
 
+  useEffect(() => {
+    if (router.pathname !== "/post") {
+      updateDisplayTitle(false, "", 0);
+    }
+  }, [router.pathname]);
+
   return (
     <>
       <header className={styles.header}>
