@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 // components
 import Editor from "@component/Editor";
 import AlertDialog from "@component/Component/AlertDialog";
+import FileUploader from "@component/Component/FileUploader";
 // common code data
 import { codeData as code } from "data/codeData";
 // axios
@@ -28,6 +29,8 @@ export default function PostRegister() {
   // post content, title
   const [data, setData] = useState();
   const [title, setTitle] = useState("");
+  // 첨부파일 list
+  const [attachFiles, setAttachFiles] = useState([]);
   // 선택된 카테고리 정보
   const [categoryId, setCategoryId] = useState(-1);
   // error 메세지
@@ -53,7 +56,17 @@ export default function PostRegister() {
 
     if (confirm("저장하시겠습니까?")) {
       try {
-        await axios.post("/api/posts", { title, content: data, categoryId });
+        const formData = new FormData();
+
+        formData.append("title", title);
+        formData.append("content", data);
+        formData.append("categoryId", categoryId);
+
+        for (const file of attachFiles) {
+          formData.append("files", file);
+        }
+
+        await axios.post("/api/posts", formData);
 
         alert("저장되었습니다.");
         router.push("/post");
@@ -143,6 +156,9 @@ export default function PostRegister() {
         />
       </Box>
       <Editor setData={setData} />
+      <Box>
+        <FileUploader onFilesChange={setAttachFiles} />
+      </Box>
       <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
         <Button variant="contained" onClick={handleSaveButton} color="inherit">
           완료

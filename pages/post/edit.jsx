@@ -9,16 +9,37 @@ import {
   Select,
 } from "@mui/material";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // components
 import Editor from "@component/Editor";
 import AlertDialog from "@component/Component/AlertDialog";
+import FileUploader from "@component/Component/FileUploader";
 // common code data
 import { codeData as code } from "data/codeData";
 // axios
 import axios from "api/axios";
+import { createServerAxios } from "api/createAxiosSSR";
 
-export default function PostEdit() {
+export async function getServerSideProps(context) {
+  const axios = createServerAxios(context);
+  const { id } = context.query;
+
+  try {
+    // post 상세 정보 조회
+    const res = await axios.get(`${process.env.API_URL}/api/posts/${id}`);
+
+    return {
+      props: {
+        post: res.data,
+      },
+    };
+  } catch (error) {
+    console.error(error.message);
+    return { notFound: true }; // 게시물이 없을 경우 404 page
+  }
+}
+
+export default function PostEdit({ post }) {
   const router = useRouter();
   const id = router.query.id;
 
@@ -27,8 +48,12 @@ export default function PostEdit() {
     { id: code.none.value, name: code.none.text },
   ]);
   // post content, title
-  const [data, setData] = useState("");
-  const [title, setTitle] = useState("");
+  const [data, setData] = useState(post.content);
+  const [title, setTitle] = useState(post.title);
+  // 새로운 첨부파일 list
+  const [newAttachFiles, setNewAttachFiles] = useState([]);
+  // 삭제된 첨부파일 Id list
+  const [deletdeFileIds, setDeletedFileIds] = useState([]);
   // 선택된 카테고리 정보
   const [categoryId, setCategoryId] = useState(-1);
   // error 메세지
@@ -41,17 +66,14 @@ export default function PostEdit() {
   // 카테고리 목록 조회
   const getCategoryList = async () => {
     const { data } = await axios.get("/api/categories/all");
-    setCategories((prev) => [...prev, ...data]);
+    const updated = [{ id: code.none.value, name: code.none.text }, ...data];
+    setCategories(updated);
+
+    const found = updated.find((c) => c.id === post.category.id);
+    if (found) {
+      setCategoryId(post.category.id);
+    }
   };
-
-  // 초기화 함수, post 상세 정보 조회
-  const init = useCallback(async () => {
-    const { data } = await axios.get(`/api/posts/${id}`);
-
-    setTitle(() => data.title);
-    setData(() => data.content);
-    setCategoryId(() => data.categoryId);
-  }, [id]);
 
   // post 저장 event
   const handleSaveButton = async () => {
@@ -62,11 +84,18 @@ export default function PostEdit() {
 
     if (confirm("저장하시겠습니까?")) {
       try {
-        await axios.put(`/api/posts/${id}`, {
-          title,
-          content: data,
-          categoryId,
-        });
+        const formData = new FormData();
+
+        formData.append("title", title);
+        formData.append("content", data);
+        formData.append("categoryId", categoryId);
+        formData.append("deletedFileIds", deletdeFileIds);
+
+        for (const file of newAttachFiles) {
+          formData.append("files", file);
+        }
+
+        await axios.put(`/api/posts/${id}`, formData);
 
         alert("저장되었습니다.");
         router.push(`/post/${id}`);
@@ -114,14 +143,17 @@ export default function PostEdit() {
   useEffect(() => {
     if (router.isReady) {
       getCategoryList();
-      init();
     }
-  }, [init, router.isReady]);
+  }, [router.isReady]);
 
   return (
     <>
       <Box sx={{ minWidth: 120 }}>
-        <FormControl size="small" sx={{ minWidth: 200 }} error={categoryError}>
+        <FormControl
+          size="small"
+          sx={{ minWidth: 200 }}
+          error={!!categoryError}
+        >
           <Select
             id="categroy"
             value={categoryId}
@@ -155,6 +187,13 @@ export default function PostEdit() {
         />
       </Box>
       <Editor data={data} setData={setData} />
+      <Box>
+        <FileUploader
+          initialFiles={post.attachments}
+          onFilesChange={setNewAttachFiles}
+          onDeletedIdsChange={setDeletedFileIds}
+        />
+      </Box>
       <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
         <Button variant="contained" onClick={handleSaveButton} color="inherit">
           수정

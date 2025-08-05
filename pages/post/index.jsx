@@ -128,7 +128,7 @@ export default function Post() {
                           variant="caption"
                           sx={{ display: "block" }}
                         >
-                          {post.categoryName} ·{" "}
+                          {post.category.name} ·{" "}
                           {moment(post.createdDate).format("YYYY.MM.DD")}
                         </Typography>
                       </>
