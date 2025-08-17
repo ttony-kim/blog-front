@@ -20,10 +20,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "contexts/AuthContext";
+import { useCategory } from "contexts/CategoryContext";
 // custom css
 import styles from "@styles/Layout.module.css";
-// common code data
-import { codeData as code } from "data/codeData";
 // axios
 import axios from "api/axios";
 // components
@@ -32,13 +31,9 @@ import AlertDialog from "@component/Component/AlertDialog";
 export default function Header() {
   const router = useRouter();
   const { logout, isLoggedIn } = useAuth();
+  const { categories, selectedCategoryId, setSelectedCategoryId } =
+    useCategory();
 
-  // 카테고리 목록
-  const [categories, setCategories] = useState([
-    { id: code.all.value, name: code.all.text },
-  ]);
-  // 선택된 카테고리 ID
-  const [selectedCategoryId, setSelectedCategoryId] = useState(-1);
   // 관리 메뉴 visible 여부
   const [isVisible, setIsVisible] = useState(false);
   // 검색어
@@ -52,12 +47,6 @@ export default function Header() {
   // alert open 여부
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // 카테고리 목록 조회
-  const getCategoryList = async () => {
-    const { data } = await axios.get("/api/categories/all");
-    setCategories((prev) => [...prev, ...data]);
-  };
-
   // post count 조회
   const getPostCount = async ({ categoryId, searchValue }) => {
     const { data } = await axios.get("/api/posts/count", {
@@ -70,6 +59,7 @@ export default function Header() {
     return data;
   };
 
+  // 검색 및 카테고리 선택 시 정보 update 함수
   const updateDisplayTitle = (isVisible, title, count) => {
     setDisplayTitle({
       isVisible,
@@ -130,18 +120,16 @@ export default function Header() {
   };
 
   useEffect(() => {
-    getCategoryList();
-  }, []);
-
-  useEffect(() => {
     if (router.pathname !== "/post") {
       updateDisplayTitle(false, "", 0);
+      setSelectedCategoryId(-1);
     }
   }, [router.pathname]);
 
   return (
     <>
       <header className={styles.header}>
+        {/* Navigation Menu */}
         <Stack direction="row" sx={{ width: 400 }}>
           <IconButton onClick={() => router.push("/")}>
             <Avatar>DS</Avatar>
@@ -173,14 +161,20 @@ export default function Header() {
                   {isLoggedIn && (
                     <>
                       <ListItem disablePadding>
-                        <ListItemButton sx={{ py: 0, minHeight: 19 }}>
+                        <ListItemButton
+                          sx={{ py: 0, minHeight: 19 }}
+                          onClick={() => handleNavMenuItemClick("/management")}
+                        >
                           <ListItemText
                             primary="관리"
-                            primaryTypographyProps={{
-                              color: "primary",
-                              fontSize: 12,
-                              textAlign: "center",
-                              color: "#666",
+                            slotProps={{
+                              primary: {
+                                sx: {
+                                  fontSize: 12,
+                                  textAlign: "center",
+                                  color: "#666",
+                                },
+                              },
                             }}
                           />
                         </ListItemButton>
@@ -199,11 +193,14 @@ export default function Header() {
                     >
                       <ListItemText
                         primary="글쓰기"
-                        primaryTypographyProps={{
-                          color: "primary",
-                          fontSize: 12,
-                          textAlign: "center",
-                          color: "#666",
+                        slotProps={{
+                          primary: {
+                            sx: {
+                              fontSize: 12,
+                              textAlign: "center",
+                              color: "#666",
+                            },
+                          },
                         }}
                       />
                     </ListItemButton>
@@ -218,11 +215,14 @@ export default function Header() {
                     >
                       <ListItemText
                         primary={isLoggedIn ? "로그아웃" : "로그인"}
-                        primaryTypographyProps={{
-                          color: "primary",
-                          fontSize: 12,
-                          textAlign: "center",
-                          color: "#666",
+                        slotProps={{
+                          primary: {
+                            sx: {
+                              fontSize: 12,
+                              textAlign: "center",
+                              color: "#666",
+                            },
+                          },
                         }}
                       />
                     </ListItemButton>
@@ -235,12 +235,16 @@ export default function Header() {
             </p>
           </Box>
         </Stack>
+
+        {/* Search & Category 정보 */}
         <Box sx={{ m: "0 auto" }}>
           <p>
             {displayTitle.isVisible &&
               `${displayTitle.title} (${displayTitle.count})`}
           </p>
         </Box>
+
+        {/* Search & Category 선택 */}
         <Stack
           direction="row"
           alignItems="center"
@@ -294,6 +298,8 @@ export default function Header() {
           </FormControl>
         </Stack>
       </header>
+
+      {/* Alert Dialog */}
       <AlertDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}

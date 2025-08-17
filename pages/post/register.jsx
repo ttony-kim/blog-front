@@ -36,16 +36,15 @@ export default function PostRegister() {
   // error 메세지
   const [titleError, setTitleError] = useState("");
   const [categoryError, setCategoryError] = useState("");
-
-  // 카테고리 목록 조회
-  const getCategoryList = async () => {
-    const { data } = await axios.get("/api/categories/all");
-    setCategories((prev) => [...prev, ...data]);
-  };
-
   // alert open 여부
   const [dialogOpen, setDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // 카테고리 목록 조회
+  const getCategoryList = async () => {
+    const { data } = await axios.get("/api/categories");
+    setCategories((prev) => [...prev, ...data]);
+  };
 
   // post 저장 event
   const handleSaveButton = async () => {

@@ -65,7 +65,7 @@ export default function PostEdit({ post }) {
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
-    const { data } = await axios.get("/api/categories/all");
+    const { data } = await axios.get("/api/categories");
     const updated = [{ id: code.none.value, name: code.none.text }, ...data];
     setCategories(updated);
 
@@ -182,6 +182,7 @@ export default function PostEdit({ post }) {
           variant="standard"
           value={title}
           onChange={handleTitleChange}
+          placeholder="Title"
           error={titleError !== "" || false}
           helperText={titleError}
         />
