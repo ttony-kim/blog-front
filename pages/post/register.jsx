@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import Editor from "@component/Editor";
 import AlertDialog from "@component/Component/AlertDialog";
 import FileUploader from "@component/Component/FileUploader";
+import ConfirmDialog from "@component/Component/ConfirmDialog";
 // common code data
 import { codeData as code } from "data/codeData";
 // axios
@@ -36,9 +37,13 @@ export default function PostRegister() {
   // error 메세지
   const [titleError, setTitleError] = useState("");
   const [categoryError, setCategoryError] = useState("");
-  // alert open 여부
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  // confirm open 여부
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  // alert Dialog 정보
+  const [alertDialog, setAlertDialog] = useState({
+    open: false,
+    message: "",
+  });
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
@@ -47,32 +52,24 @@ export default function PostRegister() {
   };
 
   // post 저장 event
-  const handleSaveButton = async () => {
-    // validation check
-    if (!validate()) {
-      return false;
-    }
+  const handlePostSave = async () => {
+    try {
+      const formData = new FormData();
 
-    if (confirm("저장하시겠습니까?")) {
-      try {
-        const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", data);
+      formData.append("categoryId", categoryId);
 
-        formData.append("title", title);
-        formData.append("content", data);
-        formData.append("categoryId", categoryId);
-
-        for (const file of attachFiles) {
-          formData.append("files", file);
-        }
-
-        await axios.post("/api/posts", formData);
-
-        alert("저장되었습니다.");
-        router.push("/post");
-      } catch (error) {
-        setDialogOpen(true);
-        setErrorMessage(error.message);
+      for (const file of attachFiles) {
+        formData.append("files", file);
       }
+
+      await axios.post("/api/posts", formData);
+
+      setAlertDialog({ open: true, message: "저장되었습니다" });
+      router.push("/post");
+    } catch (error) {
+      setAlertDialog({ open: true, message: error.message });
     }
   };
 
@@ -159,14 +156,30 @@ export default function PostRegister() {
         <FileUploader onFilesChange={setAttachFiles} />
       </Box>
       <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
-        <Button variant="contained" onClick={handleSaveButton} color="inherit">
+        <Button
+          variant="contained"
+          onClick={() => {
+            if (!validate()) return false;
+            setConfirmDialogOpen(true);
+          }}
+          color="inherit"
+        >
           완료
         </Button>
       </Box>
+
+      {/* Confirm & Alert Dialog */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="게시글 저장"
+        content="저장 하시겠습니까?"
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={handlePostSave}
+      />
       <AlertDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        title={errorMessage}
+        open={alertDialog.open}
+        onClose={() => setAlertDialog({ ...alertDialog, open: false })}
+        title={alertDialog.message}
       />
     </>
   );

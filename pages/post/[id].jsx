@@ -23,6 +23,7 @@ import axios from "api/axios";
 import { createServerAxios } from "api/createAxiosSSR";
 // components
 import AlertDialog from "@component/Component/AlertDialog";
+import ConfirmDialog from "@component/Component/ConfirmDialog";
 
 export async function getServerSideProps(context) {
   const axios = createServerAxios(context);
@@ -49,21 +50,22 @@ export default function PostDetail({ post }) {
 
   // post id 값
   const id = router.query.id;
-  // alert open 여부
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  // confirm open 여부
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  // alert Dialog 정보
+  const [alertDialog, setAlertDialog] = useState({
+    open: false,
+    message: "",
+  });
 
   // post 삭제 event
   const handlePostDelete = async () => {
-    if (confirm("삭제하시겠습니까?")) {
-      try {
-        await axios.delete(`/api/posts/${id}`);
-        alert("삭제되었습니다.");
-        router.push("/post");
-      } catch (error) {
-        setDialogOpen(true);
-        setErrorMessage(error.message);
-      }
+    try {
+      await axios.delete(`/api/posts/${id}`);
+      setAlertDialog({ open: true, message: "삭제되었습니다." });
+      router.push("/post");
+    } catch (error) {
+      setAlertDialog({ open: true, message: error.message });
     }
   };
 
@@ -141,7 +143,7 @@ export default function PostDetail({ post }) {
           >
             <ModeIcon />
           </IconButton>
-          <IconButton onClick={handlePostDelete}>
+          <IconButton onClick={() => setConfirmDialogOpen(true)}>
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -179,10 +181,19 @@ export default function PostDetail({ post }) {
           </List>
         )}
       </Box>
+
+      {/* Confirm & Alert Dialog */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="게시글 삭제"
+        content="삭제 하시겠습니까?"
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={handlePostDelete}
+      />
       <AlertDialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        title={errorMessage}
+        open={alertDialog.open}
+        onClose={() => setAlertDialog({ ...alertDialog, open: false })}
+        title={alertDialog.message}
       />
     </>
   );
