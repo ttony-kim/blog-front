@@ -68,23 +68,28 @@ export default function Header() {
     });
   };
 
-  // 카테고리 select 선택 시 change event
-  const handleCategoryChange = async (event) => {
-    const categoryId = event.target.value;
-    const { name } = categories.find((data) => data.id == categoryId);
+  // 카테고리 select 변경 event
+  const handleCategoryChange = (event) => {
+    const categoryId = Number(event.target.value);
+    handleCategorySelect(categoryId);
 
+    router.push({
+      pathname: "/post",
+      query: { ...(categoryId > 0 && { categoryId }) },
+    });
+  };
+
+  // 카테고리 선택
+  const handleCategorySelect = async (categoryId) => {
+    const { name } = categories.find((data) => data.id == categoryId);
     setSelectedCategoryId(categoryId);
+
     if (categoryId > 0) {
       const count = await getPostCount({ categoryId });
       updateDisplayTitle(true, name, count);
     } else {
       updateDisplayTitle(false, "", 0);
     }
-
-    router.push({
-      pathname: "/post",
-      query: { ...(categoryId > 0 && { categoryId }) },
-    });
   };
 
   // 관리 메뉴 버튼 click event
@@ -125,6 +130,16 @@ export default function Header() {
       setSelectedCategoryId(-1);
     }
   }, [router.pathname]);
+
+  useEffect(() => {
+    const { categoryId } = router.query;
+    if (!categoryId) return;
+
+    const parsedId = Number(categoryId);
+    if (!isNaN(parsedId)) {
+      handleCategorySelect(parsedId);
+    }
+  }, [router.query.categoryId]);
 
   return (
     <>
@@ -167,13 +182,11 @@ export default function Header() {
                         >
                           <ListItemText
                             primary="관리"
-                            slotProps={{
-                              primary: {
-                                sx: {
-                                  fontSize: 12,
-                                  textAlign: "center",
-                                  color: "#666",
-                                },
+                            primaryTypographyProps={{
+                              sx: {
+                                fontSize: 12,
+                                textAlign: "center",
+                                color: "#666",
                               },
                             }}
                           />
@@ -193,13 +206,11 @@ export default function Header() {
                     >
                       <ListItemText
                         primary="글쓰기"
-                        slotProps={{
-                          primary: {
-                            sx: {
-                              fontSize: 12,
-                              textAlign: "center",
-                              color: "#666",
-                            },
+                        primaryTypographyProps={{
+                          sx: {
+                            fontSize: 12,
+                            textAlign: "center",
+                            color: "#666",
                           },
                         }}
                       />
@@ -215,13 +226,11 @@ export default function Header() {
                     >
                       <ListItemText
                         primary={isLoggedIn ? "로그아웃" : "로그인"}
-                        slotProps={{
-                          primary: {
-                            sx: {
-                              fontSize: 12,
-                              textAlign: "center",
-                              color: "#666",
-                            },
+                        primaryTypographyProps={{
+                          sx: {
+                            fontSize: 12,
+                            textAlign: "center",
+                            color: "#666",
                           },
                         }}
                       />

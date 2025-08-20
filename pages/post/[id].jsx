@@ -24,6 +24,7 @@ import { createServerAxios } from "api/createAxiosSSR";
 // components
 import AlertDialog from "@component/Component/AlertDialog";
 import ConfirmDialog from "@component/Component/ConfirmDialog";
+import Comments from "@component/Component/Comments";
 
 export async function getServerSideProps(context) {
   const axios = createServerAxios(context);
@@ -114,7 +115,16 @@ export default function PostDetail({ post }) {
         <Box textAlign="center">
           <Typography
             variant="subtitle2"
-            onClick={() => router.push("/post")}
+            sx={{
+              cursor: "pointer",
+              "&:hover": { textDecoration: "underline" },
+            }}
+            onClick={() =>
+              router.push({
+                pathname: "/post",
+                query: { categoryId: post.category.id },
+              })
+            }
             gutterBottom
           >
             {post.category.name}
@@ -126,16 +136,20 @@ export default function PostDetail({ post }) {
             admin · {moment(post.createdDate).format("YYYY.MM.DD HH:mm")}
           </Typography>
         </Box>
-        <Divider sx={{ margin: "20px 0px" }} />
-        <div
-          style={{ wordBreak: "break-all", overflowWrap: "break-word" }}
-          dangerouslySetInnerHTML={{
-            __html: post.content,
+        <Divider sx={{ my: 3 }} />
+        <Box
+          sx={{
+            wordBreak: "break-word",
+            overflowWrap: "anywhere",
+            typography: "body1",
           }}
+          dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </Paper>
+
+      {/* 수정, 삭제 버튼 */}
       {isLoggedIn && (
-        <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
+        <Box sx={{ mt: 2, display: "block", textAlign: "right" }}>
           <IconButton
             onClick={() =>
               router.push({ pathname: "/post/edit", query: { id } })
@@ -148,6 +162,8 @@ export default function PostDetail({ post }) {
           </IconButton>
         </Box>
       )}
+
+      {/* 첨부파일 */}
       <Box>
         {post.attachments.length > 0 && (
           <List sx={{ mt: 2 }}>
@@ -181,6 +197,9 @@ export default function PostDetail({ post }) {
           </List>
         )}
       </Box>
+
+      {/* 댓글 */}
+      <Comments />
 
       {/* Confirm & Alert Dialog */}
       <ConfirmDialog

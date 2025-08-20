@@ -31,11 +31,13 @@ export default function Post() {
     const categoryId = query.categoryId;
     const searchValue = query.searchValue;
 
-    // categoryId가 존재할 때
-    if (categoryId != undefined && categoryId != code.all.value) {
+    if (
+      categoryId != undefined &&
+      categoryId != code.all.value &&
+      !isNaN(Number(categoryId))
+    ) {
       queryString.append("categoryId", categoryId);
     }
-    // searchValue가 존재할 때
     if (searchValue != undefined) {
       queryString.append("searchValue", searchValue);
     }
@@ -85,26 +87,38 @@ export default function Post() {
 
   return (
     <>
-      <Divider />
       <List pt="0">
         {data.list.length === 0 ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "150px",
-              textAlign: "center",
-              color: "gray",
-            }}
-          >
-            검색결과가 없습니다.
-          </Box>
+          <>
+            <Divider />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "150px",
+                textAlign: "center",
+                color: "gray",
+              }}
+            >
+              검색결과가 없습니다.
+            </Box>
+            <Divider />
+          </>
         ) : (
           <>
             {data.list.map((post) => (
               <Box key={post.id}>
-                <ListItem onClick={() => router.push(`/post/${post.id}`)}>
+                <Divider />
+                <ListItem
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "#f5f5f5",
+                    },
+                  }}
+                  onClick={() => router.push(`/post/${post.id}`)}
+                >
                   <ListItemText
                     primary={post.title}
                     secondary={
@@ -135,7 +149,6 @@ export default function Post() {
                     }
                   />
                 </ListItem>
-                <Divider />
               </Box>
             ))}
           </>
