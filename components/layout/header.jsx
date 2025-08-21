@@ -49,6 +49,8 @@ export default function Header() {
 
   // post count 조회
   const getPostCount = async ({ categoryId, searchValue }) => {
+    setIsVisible(false);
+
     const { data } = await axios.get("/api/posts/count", {
       params: {
         categoryId,
@@ -81,6 +83,8 @@ export default function Header() {
 
   // 카테고리 선택
   const handleCategorySelect = async (categoryId) => {
+    setSearchValue("");
+
     const { name } = categories.find((data) => data.id == categoryId);
     setSelectedCategoryId(categoryId);
 
@@ -127,6 +131,7 @@ export default function Header() {
   useEffect(() => {
     if (router.pathname !== "/post") {
       updateDisplayTitle(false, "", 0);
+      setSearchValue("");
       setSelectedCategoryId(-1);
     }
   }, [router.pathname]);

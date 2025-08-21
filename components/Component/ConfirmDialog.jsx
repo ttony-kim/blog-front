@@ -19,12 +19,10 @@ export default function ConfirmDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      slotProps={{
-        paper: {
-          sx: {
-            minWidth: 350,
-            minHeight: 160,
-          },
+      PaperProps={{
+        sx: {
+          minWidth: 350,
+          minHeight: 160,
         },
       }}
     >
