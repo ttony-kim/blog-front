@@ -1,62 +1,113 @@
 // libraries
 import DeleteIcon from "@mui/icons-material/Delete";
 import ModeIcon from "@mui/icons-material/Mode";
-import { Box, Divider, IconButton, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Typography,
+} from "@mui/material";
 import moment from "moment";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useAuth } from "contexts/AuthContext";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+// axios
+import axios from "api/axios";
+import { createServerAxios } from "api/createAxiosSSR";
+// components
+import AlertDialog from "@component/Component/AlertDialog";
+import ConfirmDialog from "@component/Component/ConfirmDialog";
+import Comments from "@component/Component/Comments";
 
-export default function PostDetail() {
+export async function getServerSideProps(context) {
+  const axios = createServerAxios(context);
+  const { id } = context.params;
+
+  try {
+    // post 상세 정보 조회
+    const res = await axios.get(`${process.env.API_URL}/api/posts/${id}`);
+
+    return {
+      props: {
+        post: res.data,
+      },
+    };
+  } catch (error) {
+    console.error(error.message);
+    return { notFound: true }; // 게시물이 없을 경우 404 page로 리턴
+  }
+}
+
+export default function PostDetail({ post }) {
   const router = useRouter();
+  const { isLoggedIn } = useAuth();
 
   // post id 값
   const id = router.query.id;
-  // post 상세 정보
-  const [data, setData] = useState({
-    title: "",
-    content: "",
-    createdDate: "",
-    categoryName: "",
+  // confirm open 여부
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  // alert Dialog 정보
+  const [alertDialog, setAlertDialog] = useState({
+    open: false,
+    message: "",
   });
-
-  // 초기화 함수, post 상세 정보 조회
-  const init = useCallback(async () => {
-    await fetch(`/api/posts/${id}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setData({
-          title: json.title,
-          content: json.content,
-          createdDate: moment(json.createdDate).format("YYYY.M.DD HH:mm"),
-          categoryName: json.categoryName,
-        });
-      });
-  }, [id]);
 
   // post 삭제 event
   const handlePostDelete = async () => {
-    if (confirm("삭제하시겠습니까?")) {
-      await fetch(`/api/posts/${id}`, { method: "delete" }).then(
-        ({ status }) => {
-          if (status === 200) {
-            alert("삭제되었습니다.");
-            router.push("/post");
-          }
-        }
-      );
+    try {
+      await axios.delete(`/api/posts/${id}`);
+      setAlertDialog({ open: true, message: "삭제되었습니다." });
+      router.push("/post");
+    } catch (error) {
+      setAlertDialog({ open: true, message: error.message });
     }
   };
 
-  useEffect(() => {
-    if (router.isReady) {
-      init();
-    }
-  }, [init, router.isReady]);
+  // 첨부파일 다운로드 event
+  const handleAttachmentDownload = async (id) => {
+    await axios
+      .get(`/api/attachment/download/${id}`, {
+        responseType: "blob",
+      })
+      .then((response) => {
+        const disposition = response.headers["content-disposition"];
+        const match = disposition.match(/filename\*=UTF-8''(.+)/);
+        let fileName = "unknown";
+
+        if (match) {
+          // 'filename*=' 일 경우
+          fileName = decodeURIComponent(match[1]);
+        } else {
+          // 'filename=' 일 경우
+          const fallbackMatch = disposition.match(/filename="(.+?)"/);
+          if (fallbackMatch) fileName = fallbackMatch[1];
+        }
+
+        const blob = new Blob([response.data]);
+
+        return { blob, fileName };
+      })
+      .then(({ blob, fileName }) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("다운로드 실패:", error);
+        setDialogOpen(true);
+        setErrorMessage("다운로드에 실패하였습니다.");
+      });
+  };
 
   return (
     <>
@@ -64,36 +115,105 @@ export default function PostDetail() {
         <Box textAlign="center">
           <Typography
             variant="subtitle2"
-            onClick={() => router.push("/post")}
+            sx={{
+              cursor: "pointer",
+              "&:hover": { textDecoration: "underline" },
+            }}
+            onClick={() =>
+              router.push({
+                pathname: "/post",
+                query: { categoryId: post.category.id },
+              })
+            }
             gutterBottom
           >
-            {data.categoryName}
+            {post.category.name}
           </Typography>
           <Typography variant="h3" gutterBottom>
-            {data.title}
+            {post.title}
           </Typography>
           <Typography variant="subtitle2" gutterBottom>
-            admin · {data.createdDate}
+            admin · {moment(post.createdDate).format("YYYY.MM.DD HH:mm")}
           </Typography>
         </Box>
-        <Divider sx={{ margin: "20px 0px" }} />
-        <div
-          style={{ wordBreak: "break-all", overflowWrap: "break-word" }}
-          dangerouslySetInnerHTML={{
-            __html: data.content,
+        <Divider sx={{ my: 3 }} />
+        <Box
+          sx={{
+            wordBreak: "break-word",
+            overflowWrap: "anywhere",
+            typography: "body1",
           }}
+          dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </Paper>
-      <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
-        <IconButton
-          onClick={() => router.push({ pathname: "/post/edit", query: { id } })}
-        >
-          <ModeIcon />
-        </IconButton>
-        <IconButton onClick={handlePostDelete}>
-          <DeleteIcon />
-        </IconButton>
+
+      {/* 수정, 삭제 버튼 */}
+      {isLoggedIn && (
+        <Box sx={{ mt: 2, display: "block", textAlign: "right" }}>
+          <IconButton
+            onClick={() =>
+              router.push({ pathname: "/post/edit", query: { id } })
+            }
+          >
+            <ModeIcon />
+          </IconButton>
+          <IconButton onClick={() => setConfirmDialogOpen(true)}>
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      )}
+
+      {/* 첨부파일 */}
+      <Box>
+        {post.attachments.length > 0 && (
+          <List sx={{ mt: 2 }}>
+            {post.attachments.map((file, index) => (
+              <ListItem key={index} disablePadding>
+                <ListItemButton
+                  onClick={() => handleAttachmentDownload(file.id)}
+                  sx={{ pl: 1, "&:hover": { backgroundColor: "#f5f5f5" } }}
+                >
+                  <ListItemIcon sx={{ minWidth: "32px" }}>
+                    <AttachFileIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" noWrap>
+                        {file.name}
+                        <Typography
+                          component="span"
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ ml: 0.5 }}
+                        >
+                          · {(file.size / 1024).toFixed(1)} KB
+                        </Typography>
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        )}
       </Box>
+
+      {/* 댓글 */}
+      <Comments />
+
+      {/* Confirm & Alert Dialog */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="게시글 삭제"
+        content="삭제 하시겠습니까?"
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={handlePostDelete}
+      />
+      <AlertDialog
+        open={alertDialog.open}
+        onClose={() => setAlertDialog({ ...alertDialog, open: false })}
+        title={alertDialog.message}
+      />
     </>
   );
 }

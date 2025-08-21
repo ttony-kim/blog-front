@@ -1,84 +1,144 @@
-import { useState } from "react";
-import styles from "@styles/Login.module.css";
+// libraries
 import { useRouter } from "next/router";
-import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
-
-const AlertDialog = ({ open, onClose, title }) => (
-  <Dialog open={open} onClose={onClose} aria-labelledby="alert-dialog-title">
-    <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-    <DialogActions>
-      <Button onClick={onClose} autoFocus>
-        닫기
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+import { useState } from "react";
+import { useAuth } from "contexts/AuthContext";
+import { Box, Button, TextField, Typography } from "@mui/material";
+// axios
+import authAxios from "api/authAxios";
+// components
+import AlertDialog from "@component/Component/AlertDialog";
 
 export default function Login() {
   const router = useRouter();
+  const { login } = useAuth();
 
   // 로그인 정보
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   // alert open 여부
   const [dialogOpen, setDialogOpen] = useState(false);
+  // error 메세지
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
+  // 로그인 버튼 submit event
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // validation check
+    if (!validate()) {
+      return false;
+    }
+
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const { data: token } = await authAxios.post("/api/login", {
+        email,
+        password,
       });
 
-      if (response.ok) {
-        const token = await response.text();
-        if (token) {
-          localStorage.setItem("token", token);
-          router.push({ pathname: "/post" });
-        } else {
-          console.error("토큰이 비어있습니다.");
-          setDialogOpen(true);
-        }
-      } else {
-        // 로그인 실패 처리
-        console.error("로그인 실패:", response.statusText);
-        setDialogOpen(true);
+      if (!token) {
+        throw new Error("토큰이 비어있습니다.");
       }
+
+      login(token);
+      router.push({ pathname: "/post" });
     } catch (error) {
-      // 네트워크 오류 등의 예외사항
-      console.error("로그인 에러:", error);
+      console.error(error?.message || "알 수 없는 오류가 발생했습니다");
       setDialogOpen(true);
     }
   };
 
+  // validation check
+  const validate = () => {
+    let retrunValue = true;
+    // email 유효성 검사
+    if (!email?.trim()) {
+      setEmailError("Email을 입력하세요.");
+      retrunValue = false;
+    } else {
+      setEmailError("");
+    }
+
+    // password 유효성 검사
+    if (!password?.trim()) {
+      setPasswordError("Password를 입력하세요.");
+      retrunValue = false;
+    } else {
+      setPasswordError("");
+    }
+
+    return retrunValue;
+  };
+
   return (
     <>
-      <div className={styles.container}>
-        <h1 className={styles.title}>Blog</h1>
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <input
-            type="text"
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          height: "100vh",
+          backgroundColor: "#ffffff",
+          paddingTop: "20vh",
+        }}
+      >
+        <Typography
+          variant="h1"
+          sx={{
+            color: "#666666",
+            mb: 3,
+          }}
+        >
+          Blog
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: 300,
+            gap: 1,
+          }}
+        >
+          <TextField
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={styles.input}
+            size="small"
+            error={emailError !== "" || false}
+            helperText={emailError}
           />
-          <input
-            type="password"
+          <TextField
             placeholder="Password"
+            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={styles.input}
+            size="small"
+            error={passwordError !== "" || false}
+            helperText={passwordError}
           />
-          <button type="submit" className={styles.button}>
+          <Button
+            type="submit"
+            sx={{
+              mt: "8px",
+              padding: "10px",
+              fontSize: "18px",
+              color: "#ffffff",
+              backgroundColor: "#d9d9d9",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              "&:hover": {
+                backgroundColor: "#bfbfbf",
+              },
+            }}
+          >
             로그인
-          </button>
-        </form>
-      </div>
+          </Button>
+        </Box>
+      </Box>
       <AlertDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
