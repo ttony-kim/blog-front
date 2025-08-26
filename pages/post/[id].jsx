@@ -63,8 +63,8 @@ export default function PostDetail({ post }) {
   const handlePostDelete = async () => {
     try {
       await axios.delete(`/api/posts/${id}`);
+      setConfirmDialogOpen(false);
       setAlertDialog({ open: true, message: "삭제되었습니다." });
-      router.push("/post");
     } catch (error) {
       setAlertDialog({ open: true, message: error.message });
     }
@@ -211,7 +211,10 @@ export default function PostDetail({ post }) {
       />
       <AlertDialog
         open={alertDialog.open}
-        onClose={() => setAlertDialog({ ...alertDialog, open: false })}
+        onClose={() => {
+          setAlertDialog({ ...alertDialog, open: false });
+          router.push("/post");
+        }}
         title={alertDialog.message}
       />
     </>
