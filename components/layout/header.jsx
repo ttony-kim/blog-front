@@ -42,6 +42,7 @@ export default function Header() {
   const [displayTitle, setDisplayTitle] = useState({
     isVisible: false,
     title: "",
+    countVisible: false,
     count: 0,
   });
   // alert open 여부
@@ -62,10 +63,11 @@ export default function Header() {
   };
 
   // 검색 및 카테고리 선택 시 정보 update 함수
-  const updateDisplayTitle = (isVisible, title, count) => {
+  const updateDisplayTitle = (isVisible, title, countVisible, count) => {
     setDisplayTitle({
       isVisible,
       title,
+      countVisible,
       count,
     });
   };
@@ -90,9 +92,9 @@ export default function Header() {
 
     if (categoryId > 0) {
       const count = await getPostCount({ categoryId });
-      updateDisplayTitle(true, name, count);
+      updateDisplayTitle(true, name, true, count);
     } else {
-      updateDisplayTitle(false, "", 0);
+      updateDisplayTitle(false, "", false, 0);
     }
   };
 
@@ -116,8 +118,7 @@ export default function Header() {
       return;
     }
 
-    const count = await getPostCount({ searchValue });
-    updateDisplayTitle(true, "검색결과", count);
+    updateDisplayTitle(true, `'${searchValue}'의 검색결과`, false, 0);
 
     // 카테고리 ID 초기화
     setSelectedCategoryId(-1);
@@ -130,7 +131,7 @@ export default function Header() {
 
   useEffect(() => {
     if (router.pathname !== "/post") {
-      updateDisplayTitle(false, "", 0);
+      updateDisplayTitle(false, "", false, 0);
       setSearchValue("");
       setSelectedCategoryId(-1);
     }
@@ -254,7 +255,9 @@ export default function Header() {
         <Box sx={{ m: "0 auto" }}>
           <p>
             {displayTitle.isVisible &&
-              `${displayTitle.title} (${displayTitle.count})`}
+              `${displayTitle.title}${
+                displayTitle.countVisible ? ` (${displayTitle.count})` : ""
+              }`}
           </p>
         </Box>
 
