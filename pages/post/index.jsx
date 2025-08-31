@@ -18,18 +18,19 @@ import axios from "axios";
 
 export default function Post() {
   const router = useRouter();
-  const { query } = router;
+  const { categoryId, searchValue } = router.query;
 
   // post 목록 데이터(count: 전체 목록, list: post 목록, last: 마지막 페이지이지 여부)
   const [data, setData] = useState({ count: 0, list: [], last: true });
+  // post 데이터가 없을 경우 message
+  const [emptyMessage, setEmptyMessage] =
+    useState("게시물이 존재하지 않습니다.");
   // page 정보
   const pageData = useRef({ page: 0, size: 5 });
 
   // post 목록 조회
   const getPostData = async () => {
     const queryString = new URLSearchParams(pageData.current);
-    const categoryId = query.categoryId;
-    const searchValue = query.searchValue;
 
     if (
       categoryId != undefined &&
@@ -38,7 +39,7 @@ export default function Post() {
     ) {
       queryString.append("categoryId", categoryId);
     }
-    if (searchValue != undefined) {
+    if (searchValue) {
       queryString.append("searchValue", searchValue);
     }
 
@@ -52,6 +53,14 @@ export default function Post() {
     // 페이지 0으로 초기화
     pageData.current.page = 0;
     const resultData = await getPostData();
+
+    if (resultData.totalElements === 0) {
+      if (searchValue) {
+        setEmptyMessage("검색결과가 없습니다.");
+      } else {
+        setEmptyMessage("게시물이 존재하지 않습니다.");
+      }
+    }
 
     // 리스트 새로 생성
     setData(() => ({
@@ -83,7 +92,7 @@ export default function Post() {
   useEffect(() => {
     if (!router.isReady) return;
     init();
-  }, [query]);
+  }, [router.query]);
 
   return (
     <>
@@ -101,7 +110,7 @@ export default function Post() {
                 color: "gray",
               }}
             >
-              검색결과가 없습니다.
+              {emptyMessage}
             </Box>
             <Divider />
           </>

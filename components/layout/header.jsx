@@ -87,12 +87,14 @@ export default function Header() {
   const handleCategorySelect = async (categoryId) => {
     setSearchValue("");
 
-    const { name } = categories.find((data) => data.id == categoryId);
+    const category = categories.find((data) => data.id == categoryId);
+    if (!category) return;
+
     setSelectedCategoryId(categoryId);
 
     if (categoryId > 0) {
       const count = await getPostCount({ categoryId });
-      updateDisplayTitle(true, name, true, count);
+      updateDisplayTitle(true, category.name, true, count);
     } else {
       updateDisplayTitle(false, "", false, 0);
     }
@@ -145,7 +147,7 @@ export default function Header() {
     if (!isNaN(parsedId)) {
       handleCategorySelect(parsedId);
     }
-  }, [router.query.categoryId]);
+  }, [router.query.categoryId, categories]);
 
   return (
     <>

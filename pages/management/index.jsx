@@ -99,13 +99,12 @@ export default function Management() {
     setSaveDialogOpen(false);
 
     try {
-      await axios.post(
-        "/api/categories",
-        categories.map((item, index) => ({
-          ...item,
-          displayOrder: index + 1,
-        }))
-      );
+      const data = categories.map((item, index) => ({
+        ...item,
+        displayOrder: index + 1,
+      }));
+
+      await axios.post("/api/categories", { categories: data });
 
       setAlertDialog({ open: true, message: "저장되었습니다" });
       setIsDirty(false);
