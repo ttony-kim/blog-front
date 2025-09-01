@@ -12,8 +12,13 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 // components
 import Editor from "@component/Editor";
+import AlertDialog from "@component/Component/AlertDialog";
+import FileUploader from "@component/Component/FileUploader";
+import ConfirmDialog from "@component/Component/ConfirmDialog";
 // common code data
 import { codeData as code } from "data/codeData";
+// axios
+import axios from "api/axios";
 
 export default function PostRegister() {
   const router = useRouter();
@@ -25,44 +30,46 @@ export default function PostRegister() {
   // post content, title
   const [data, setData] = useState();
   const [title, setTitle] = useState("");
+  // 첨부파일 list
+  const [attachFiles, setAttachFiles] = useState([]);
   // 선택된 카테고리 정보
   const [categoryId, setCategoryId] = useState(-1);
   // error 메세지
   const [titleError, setTitleError] = useState("");
   const [categoryError, setCategoryError] = useState("");
+  // confirm open 여부
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  // alert Dialog 정보
+  const [alertDialog, setAlertDialog] = useState({
+    open: false,
+    message: "",
+  });
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
-    await fetch(`/api/categories/all`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setCategories((prev) => [...prev, ...json]);
-      });
+    const { data } = await axios.get("/api/categories");
+    setCategories((prev) => [...prev, ...data]);
   };
 
   // post 저장 event
-  const handleSaveButton = async () => {
-    // validation check
-    if (!validate()) {
-      return false;
-    }
+  const handlePostSave = async () => {
+    try {
+      const formData = new FormData();
 
-    if (confirm("저장하시겠습니까?")) {
-      await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content: data, categoryId }),
-      }).then(({ status }) => {
-        if (status === 200) {
-          alert("저장되었습니다.");
-          router.push("/post");
-        }
-      });
+      formData.append("title", title);
+      formData.append("content", data);
+      formData.append("categoryId", categoryId);
+
+      for (const file of attachFiles) {
+        formData.append("files", file);
+      }
+
+      await axios.post("/api/posts", formData);
+
+      setAlertDialog({ open: true, message: "저장되었습니다" });
+      router.push("/post");
+    } catch (error) {
+      setAlertDialog({ open: true, message: error.message });
     }
   };
 
@@ -107,7 +114,11 @@ export default function PostRegister() {
   return (
     <>
       <Box sx={{ minWidth: 120 }}>
-        <FormControl size="small" sx={{ minWidth: 200 }} error={categoryError}>
+        <FormControl
+          size="small"
+          sx={{ minWidth: 200 }}
+          error={!!categoryError}
+        >
           <Select
             id="categroy"
             value={categoryId}
@@ -141,11 +152,35 @@ export default function PostRegister() {
         />
       </Box>
       <Editor setData={setData} />
+      <Box>
+        <FileUploader onFilesChange={setAttachFiles} />
+      </Box>
       <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
-        <Button variant="contained" onClick={handleSaveButton} color="inherit">
+        <Button
+          variant="contained"
+          onClick={() => {
+            if (!validate()) return false;
+            setConfirmDialogOpen(true);
+          }}
+          color="inherit"
+        >
           완료
         </Button>
       </Box>
+
+      {/* Confirm & Alert Dialog */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="게시글 저장"
+        content="저장 하시겠습니까?"
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={handlePostSave}
+      />
+      <AlertDialog
+        open={alertDialog.open}
+        onClose={() => setAlertDialog({ ...alertDialog, open: false })}
+        title={alertDialog.message}
+      />
     </>
   );
 }

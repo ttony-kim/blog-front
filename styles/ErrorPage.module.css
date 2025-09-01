@@ -5,13 +5,23 @@
   justify-content: flex-start;
   height: 100vh;
   background-color: #ffffff;
-  padding-top: 15vh; /* 화면 높이의 15% 만큼 상단 여백 추가 */
+  padding-top: 30vh; /* 화면 높이의 15% 만큼 상단 여백 추가 */
 }
 
 .title {
-  font-size: 80px;
+  font-size: 35px;
   color: #666666;
-  margin-bottom: 30px; /* 간격 축소 */
+  margin-bottom: 20px;
+}
+
+.messageBox {
+  text-align: center;
+  margin-bottom: 25x;
+}
+
+.message {
+  font-size: 13px;
+  color: #666666;
 }
 
 .form {
@@ -20,16 +30,8 @@
   width: 300px;
 }
 
-.input {
-  margin-bottom: 8px; /* 간격 축소 */
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #cccccc;
-  border-radius: 5px;
-}
-
 .button {
-  margin-top: 15px; /* 간격 축소 */
+  margin-bottom: 10px;
   padding: 10px;
   font-size: 18px;
   color: #ffffff;
@@ -41,4 +43,14 @@
 
 .button:hover {
   background-color: #bfbfbf;
+}
+
+.secondaryButton {
+  background-color: #f0f0f0;
+  color: #666666;
+  border: 1px solid #d9d9d9;
+}
+
+.secondaryButton:hover {
+  background-color: #e8e8e8;
 }

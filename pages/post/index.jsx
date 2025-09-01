@@ -13,39 +13,39 @@ import { useEffect, useRef, useState } from "react";
 import moment from "moment";
 // common code data
 import { codeData as code } from "data/codeData";
+// axios
+import axios from "axios";
 
 export default function Post() {
   const router = useRouter();
-  const { query } = router;
+  const { categoryId, searchValue } = router.query;
 
   // post 목록 데이터(count: 전체 목록, list: post 목록, last: 마지막 페이지이지 여부)
   const [data, setData] = useState({ count: 0, list: [], last: true });
+  // post 데이터가 없을 경우 message
+  const [emptyMessage, setEmptyMessage] =
+    useState("게시물이 존재하지 않습니다.");
   // page 정보
   const pageData = useRef({ page: 0, size: 5 });
 
   // post 목록 조회
   const getPostData = async () => {
     const queryString = new URLSearchParams(pageData.current);
-    const categoryId = query.categoryId;
 
-    // categoryId가 존재 할때
-    if (categoryId != undefined && categoryId != code.all.value) {
+    if (
+      categoryId != undefined &&
+      categoryId != code.all.value &&
+      !isNaN(Number(categoryId))
+    ) {
       queryString.append("categoryId", categoryId);
     }
+    if (searchValue) {
+      queryString.append("searchValue", searchValue);
+    }
 
-    const resultData = await fetch(`/api/posts?${queryString.toString()}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        return json;
-      })
-      .catch((error) => console.log(error.message));
+    const { data } = await axios.get(`/api/posts?${queryString.toString()}`);
 
-    return resultData;
+    return data;
   };
 
   // 초기 데이터 조회 및 category id 변경됐을 경우 실행
@@ -53,6 +53,14 @@ export default function Post() {
     // 페이지 0으로 초기화
     pageData.current.page = 0;
     const resultData = await getPostData();
+
+    if (resultData.totalElements === 0) {
+      if (searchValue) {
+        setEmptyMessage("검색결과가 없습니다.");
+      } else {
+        setEmptyMessage("게시물이 존재하지 않습니다.");
+      }
+    }
 
     // 리스트 새로 생성
     setData(() => ({
@@ -84,43 +92,76 @@ export default function Post() {
   useEffect(() => {
     if (!router.isReady) return;
     init();
-  }, [query]);
+  }, [router.query]);
 
   return (
     <>
-      <Divider />
       <List pt="0">
-        {data.list.map((post) => (
-          <Box key={post.id}>
-            <ListItem onClick={() => router.push(`/post/${post.id}`)}>
-              <ListItemText
-                primary={post.title}
-                secondary={
-                  <div>
-                    <Typography
-                      component="p"
-                      variant="body2"
-                      sx={{
-                        lineHeight: "1.5",
-                        minHeight: "3.5em",
-                        maxHeight: "3.5em",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {removeTags(post.content)}
-                    </Typography>
-                    <Typography component="p" variant="caption">
-                      {post.categoryName} ·{" "}
-                      {moment(post.createdDate).format("YYYY.MM.DD")}
-                    </Typography>
-                  </div>
-                }
-              />
-            </ListItem>
+        {data.list.length === 0 ? (
+          <>
             <Divider />
-          </Box>
-        ))}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "150px",
+                textAlign: "center",
+                color: "gray",
+              }}
+            >
+              {emptyMessage}
+            </Box>
+            <Divider />
+          </>
+        ) : (
+          <>
+            {data.list.map((post) => (
+              <Box key={post.id}>
+                <Divider />
+                <ListItem
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "#f5f5f5",
+                    },
+                  }}
+                  onClick={() => router.push(`/post/${post.id}`)}
+                >
+                  <ListItemText
+                    primary={post.title}
+                    secondary={
+                      <>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{
+                            lineHeight: "1.5",
+                            minHeight: "3.5em",
+                            maxHeight: "3.5em",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "block",
+                          }}
+                        >
+                          {removeTags(post.content)}
+                        </Typography>
+                        <Typography
+                          component="span"
+                          variant="caption"
+                          sx={{ display: "block" }}
+                        >
+                          {post.category.name} ·{" "}
+                          {moment(post.createdDate).format("YYYY.MM.DD")}
+                        </Typography>
+                      </>
+                    }
+                  />
+                </ListItem>
+              </Box>
+            ))}
+          </>
+        )}
         {!data.last && (
           <Box mt="10px" sx={{ textAlign: "center" }}>
             <Button

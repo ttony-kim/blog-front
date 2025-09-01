@@ -9,13 +9,38 @@ import {
   Select,
 } from "@mui/material";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // components
 import Editor from "@component/Editor";
+import AlertDialog from "@component/Component/AlertDialog";
+import FileUploader from "@component/Component/FileUploader";
+import ConfirmDialog from "@component/Component/ConfirmDialog";
 // common code data
 import { codeData as code } from "data/codeData";
+// axios
+import axios from "api/axios";
+import { createServerAxios } from "api/createAxiosSSR";
 
-export default function PostEdit() {
+export async function getServerSideProps(context) {
+  const axios = createServerAxios(context);
+  const { id } = context.query;
+
+  try {
+    // post 상세 정보 조회
+    const res = await axios.get(`${process.env.API_URL}/api/posts/${id}`);
+
+    return {
+      props: {
+        post: res.data,
+      },
+    };
+  } catch (error) {
+    console.error(error.message);
+    return { notFound: true }; // 게시물이 없을 경우 404 page
+  }
+}
+
+export default function PostEdit({ post }) {
   const router = useRouter();
   const id = router.query.id;
 
@@ -24,62 +49,57 @@ export default function PostEdit() {
     { id: code.none.value, name: code.none.text },
   ]);
   // post content, title
-  const [data, setData] = useState("");
-  const [title, setTitle] = useState("");
+  const [data, setData] = useState(post.content);
+  const [title, setTitle] = useState(post.title);
+  // 새로운 첨부파일 list
+  const [newAttachFiles, setNewAttachFiles] = useState([]);
+  // 삭제된 첨부파일 Id list
+  const [deletdeFileIds, setDeletedFileIds] = useState([]);
   // 선택된 카테고리 정보
   const [categoryId, setCategoryId] = useState(-1);
   // error 메세지
   const [titleError, setTitleError] = useState("");
   const [categoryError, setCategoryError] = useState("");
+  // confirm open 여부
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  // alert Dialog 정보
+  const [alertDialog, setAlertDialog] = useState({
+    open: false,
+    message: "",
+  });
 
   // 카테고리 목록 조회
   const getCategoryList = async () => {
-    await fetch(`/api/categories/all`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setCategories((prev) => [...prev, ...json]);
-      });
+    const { data } = await axios.get("/api/categories");
+    const updated = [{ id: code.none.value, name: code.none.text }, ...data];
+    setCategories(updated);
+
+    const found = updated.find((c) => c.id === post.category.id);
+    if (found) {
+      setCategoryId(post.category.id);
+    }
   };
 
-  // 초기화 함수, post 상세 정보 조회
-  const init = useCallback(async () => {
-    await fetch(`/api/posts/${id}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`${res.status} 에러가 발생했습니다.`);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setTitle(() => json.title);
-        setData(() => json.content);
-        setCategoryId(() => json.categoryId);
-      });
-  }, [id]);
-
   // post 저장 event
-  const handleSaveButton = async () => {
-    // validation check
-    if (!validate()) {
-      return false;
-    }
+  const handlePostSave = async () => {
+    try {
+      const formData = new FormData();
 
-    if (confirm("저장하시겠습니까?")) {
-      await fetch(`/api/posts/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content: data, categoryId }),
-      }).then(({ status }) => {
-        if (status === 200) {
-          alert("저장되었습니다.");
-          router.push(`/post/${id}`);
-        }
-      });
+      formData.append("title", title);
+      formData.append("content", data);
+      formData.append("categoryId", categoryId);
+      formData.append("deletedFileIds", deletdeFileIds);
+
+      for (const file of newAttachFiles) {
+        formData.append("files", file);
+      }
+
+      await axios.put(`/api/posts/${id}`, formData);
+
+      setAlertDialog({ open: true, message: "저장되었습니다" });
+      router.push(`/post/${id}`);
+    } catch (error) {
+      setAlertDialog({ open: true, message: error.message });
     }
   };
 
@@ -120,14 +140,17 @@ export default function PostEdit() {
   useEffect(() => {
     if (router.isReady) {
       getCategoryList();
-      init();
     }
-  }, [init, router.isReady]);
+  }, [router.isReady]);
 
   return (
     <>
       <Box sx={{ minWidth: 120 }}>
-        <FormControl size="small" sx={{ minWidth: 200 }} error={categoryError}>
+        <FormControl
+          size="small"
+          sx={{ minWidth: 200 }}
+          error={!!categoryError}
+        >
           <Select
             id="categroy"
             value={categoryId}
@@ -156,19 +179,48 @@ export default function PostEdit() {
           variant="standard"
           value={title}
           onChange={handleTitleChange}
+          placeholder="Title"
           error={titleError !== "" || false}
           helperText={titleError}
         />
       </Box>
       <Editor data={data} setData={setData} />
+      <Box>
+        <FileUploader
+          initialFiles={post.attachments}
+          onFilesChange={setNewAttachFiles}
+          onDeletedIdsChange={setDeletedFileIds}
+        />
+      </Box>
       <Box sx={{ margin: "10px", display: "block", textAlign: "right" }}>
-        <Button variant="contained" onClick={handleSaveButton} color="inherit">
+        <Button
+          variant="contained"
+          onClick={() => {
+            if (!validate()) return false;
+            setConfirmDialogOpen(true);
+          }}
+          color="inherit"
+        >
           수정
         </Button>
         <Button onClick={() => router.push("/post")} color="inherit">
           취소
         </Button>
       </Box>
+
+      {/* Confirm & Alert Dialog */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="게시글 저장"
+        content="저장 하시겠습니까?"
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={handlePostSave}
+      />
+      <AlertDialog
+        open={alertDialog.open}
+        onClose={() => setAlertDialog({ ...alertDialog, open: false })}
+        title={alertDialog.message}
+      />
     </>
   );
 }
