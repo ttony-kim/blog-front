@@ -14,7 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 const MAX_FILES = 5; // 최대 파일 개수
 const MAX_FILE_SIZE_MB = 5; // 개별 파일당 최대 용량
-const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".pdf"]; // 허용 확장자
+const ALLOWED_EXTENSIONS = [".txt", ".jpg", ".jpeg", ".png", ".pdf"]; // 허용 확장자
 
 const FileUploader = ({
   onFilesChange,
