@@ -11,7 +11,7 @@ import {
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 // components
-import Editor from "@component/Editor";
+import Editor from "@component/editor";
 import AlertDialog from "@component/Component/AlertDialog";
 import FileUploader from "@component/Component/FileUploader";
 import ConfirmDialog from "@component/Component/ConfirmDialog";
