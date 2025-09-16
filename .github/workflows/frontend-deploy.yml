@@ -25,7 +25,7 @@ jobs:
       - name: Prepare deploy package
         run: |
           mkdir deploy
-          cp -r .next public package*.json deploy/
+          cp -r .next public package*.json .env.production deploy/
           cd deploy
           tar -czf app.tar.gz *
       - name: Upload artifact
