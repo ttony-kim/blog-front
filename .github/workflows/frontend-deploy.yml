@@ -27,19 +27,18 @@ jobs:
           echo "NEXT_PUBLIC_GISCUS_CATEGORY=${{ secrets.GISCUS_CATEGORY }}" >> .env.production
           echo "NEXT_PUBLIC_GISCUS_CATEGORY_ID=${{ secrets.GISCUS_CATEGORY_ID }}" >> .env.production
           echo "API_URL=${{ secrets.API_URL }}" >> .env.production
-      - name: Build Next.js
+      - name: Build Nexjt.js
         run: npm run build
       - name: Prepare deploy package
         run: |
           mkdir deploy
           cp -r .next public package*.json .env.production deploy/
-          cd deploy
-          tar -czf app.tar.gz .
+          tar -czf app.tar.gz -C deploy .
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-app-deploy
-          path: deploy/app.tar.gz
+          path: app.tar.gz
 
   deploy:
     runs-on: ubuntu-latest
