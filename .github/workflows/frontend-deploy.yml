@@ -34,7 +34,7 @@ jobs:
           mkdir deploy
           cp -r .next public package*.json .env.production deploy/
           cd deploy
-          tar -czf app.tar.gz *
+          tar -czf app.tar.gz .
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
