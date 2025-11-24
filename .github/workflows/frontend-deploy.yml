@@ -20,6 +20,13 @@ jobs:
           node-version: "20"
       - name: Install dependencies
         run: npm ci
+      - name: Create .env.production file
+        run: |
+          echo "NEXT_PUBLIC_GISCUS_REPO=${{ secrets.GISCUS_REPO }}" >> .env.production
+          echo "NEXT_PUBLIC_GISCUS_REPO_ID=${{ secrets.GISCUS_REPO_ID }}" >> .env.production
+          echo "NEXT_PUBLIC_GISCUS_CATEGORY=${{ secrets.GISCUS_CATEGORY }}" >> .env.production
+          echo "NEXT_PUBLIC_GISCUS_CATEGORY_ID=${{ secrets.GISCUS_CATEGORY_ID }}" >> .env.production
+          echo "API_URL=${{ secrets.API_URL }}" >> .env.production
       - name: Build Next.js
         run: npm run build
       - name: Prepare deploy package
@@ -54,10 +61,12 @@ jobs:
           proxy_username: ${{ secrets.AWS_PROXY_SERVER_USER }}
           proxy_key: ${{ secrets.AWS_PROXY_SERVER_KEY }}
           script: |
+            cd /home/ec2-user
+            if [ -f ./build/.env.production ]; then
+              docker-compose down
+            fi
             cd /home/ec2-user/build
             rm -rf *
-            cd /home/ec2-user
-            docker-compose down
       - name: Copy tar to Server
         uses: appleboy/scp-action@v1
         with:
