@@ -1,0 +1,17 @@
+services:
+  blog-frontend:
+    image: node:18-alpine
+    container_name: blog_frontend
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    restart: always
+    volumes:
+      - ./build/package.json:/app/package.json
+      - ./build/package-lock.json:/app/package-lock.json
+      - ./build/.next:/app/.next
+      - ./build/public:/app/public
+      - ./logs:/app/logs
+    env_file:
+      - ./build/.env.production
+    command: sh -c "npm install --production --verbose > /app/logs/npm-install.log 2>&1 && npm start > /app/logs/frontend.log 2>&1"

@@ -1,10 +1,7 @@
 name: Next.js CI/CD
 
 on:
-  push:
-    branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,26 +11,37 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: "20"
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Create .env.proudction file
+        env:
+          API_URL: ${{ secrets.API_URL }}
+        run: |
+          echo "API_URL=${API_URL}" > .env.production
+
       - name: Build Next.js
         run: npm run build
+
       - name: Prepare deploy package
         run: |
-          mkdir deploy
+          mkdir -p deploy
           cp -r .next public package*.json .env.production deploy/
           cd deploy
           tar -czf app.tar.gz *
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-app-deploy
           path: deploy/app.tar.gz
-  
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -42,6 +50,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: next-app-deploy
+
       - name: Stop docker container
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -54,6 +63,7 @@ jobs:
             rm -rf *
             cd /home/kimning/front
             docker-compose down
+
       - name: Copy tar to Server
         uses: appleboy/scp-action@v1
         with:
@@ -63,6 +73,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           source: "app.tar.gz"
           target: "/home/kimning/front/build"
+
       - name: Start docker container
         uses: appleboy/ssh-action@v1.2.2
         with:
