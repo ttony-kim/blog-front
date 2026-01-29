@@ -86,7 +86,10 @@ export default function Post() {
 
   // html 태그 제거 함수
   const removeTags = (str) => {
-    return str.replace(/<[^>]*>/g, "");
+    return str
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/gi, " ")
+      .trim();
   };
 
   useEffect(() => {
@@ -136,12 +139,13 @@ export default function Post() {
                           component="span"
                           variant="body2"
                           sx={{
-                            lineHeight: "1.5",
-                            minHeight: "3.5em",
-                            maxHeight: "3.5em",
+                            lineHeight: 1.5,
+                            height: "3em", // 2줄 고정
                             overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "block",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            mb: 1,
                           }}
                         >
                           {removeTags(post.content)}
