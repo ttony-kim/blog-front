@@ -136,3 +136,11 @@ h6 {
   background: black;
   color: white;
 }
+
+.ProseMirror img,
+.viewer-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
+}

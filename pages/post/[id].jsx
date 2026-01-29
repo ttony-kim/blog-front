@@ -118,6 +118,7 @@ export default function PostDetail({ post }) {
             sx={{
               cursor: "pointer",
               "&:hover": { textDecoration: "underline" },
+              mb: 3,
             }}
             onClick={() =>
               router.push({
@@ -125,11 +126,10 @@ export default function PostDetail({ post }) {
                 query: { categoryId: post.category.id },
               })
             }
-            gutterBottom
           >
             {post.category.name}
           </Typography>
-          <Typography variant="h3" gutterBottom>
+          <Typography variant="h4" sx={{ mb: 3 }}>
             {post.title}
           </Typography>
           <Typography variant="subtitle2" gutterBottom>
@@ -138,6 +138,7 @@ export default function PostDetail({ post }) {
         </Box>
         <Divider sx={{ my: 3 }} />
         <Box
+          className="viewer-content"
           sx={{
             wordBreak: "break-word",
             overflowWrap: "anywhere",
